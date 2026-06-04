@@ -353,13 +353,6 @@
   </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    /**
-     * JURNAL KACIW - SINGLE FILE APPLICATION
-     * 
-     * PENYIMPANAN DATA:
-     * Data disimpan di LocalStorage browser secara otomatis (Auto-save).
-     * Untuk memindahkan data ke browser/komputer lain, gunakan fitur Backup & Restore.
-     */
 
     // --- KONFIGURASI APLIKASI ---
 
@@ -921,9 +914,7 @@ const supabaseClient = supabase.createClient(
       document.getElementById('btn-logout').addEventListener('click', () => location.reload());
 
       // Backup & Restore
-      document.getElementById('btn-backup-data').addEventListener('click', backupData);
-      document.getElementById('input-restore-data').addEventListener('change', (e) => restoreData(e.target.files[0]));
-
+      
       // Student
       document.getElementById('filter-student-class').addEventListener('change', renderStudents);
       document.getElementById('btn-add-student-manual').addEventListener('click', () => openModal('modal-add-student'));
