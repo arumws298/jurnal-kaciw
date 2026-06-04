@@ -978,7 +978,8 @@ const supabaseClient = supabase.createClient(
       document.getElementById('btn-download-jurnal-pdf').addEventListener('click', downloadJurnalPDF);
     }
 function setupEventListeners() {
-  
+  document.getElementById('login-form')
+  .addEventListener('submit', handleLogin);
 }
 
 async function testConnection() {
