@@ -977,10 +977,6 @@ const supabaseClient = supabase.createClient(
       document.getElementById('filter-jurnal-month').addEventListener('change', renderRekapJurnal);
       document.getElementById('btn-download-jurnal-pdf').addEventListener('click', downloadJurnalPDF);
     }
-function setupEventListeners() {
-  document.getElementById('login-form')
-  .addEventListener('submit', handleLogin);
-}
 
 async function testConnection() {
   const { data, error } = await supabaseClient
