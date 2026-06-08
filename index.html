@@ -565,10 +565,15 @@ function initApp() {
     return;
   }
 
-  showToast("Siswa berhasil ditambahkan");
+showToast("Siswa berhasil ditambahkan");
 
-  document.getElementById('form-add-student').reset();
-  closeModal('modal-add-student');
+await loadStudentsFromSupabase();
+
+renderStudents();
+updateClassDropdowns();
+
+document.getElementById('form-add-student').reset();
+closeModal('modal-add-student');
 }
 
     let deleteTarget = null;
