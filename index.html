@@ -387,7 +387,8 @@ const supabaseClient = supabase.createClient(
     .select('*');
 
   console.log("DATA SUPABASE:", data);
-  console.log("ERROR SUPABASE:", error);
+  console.log("JUMLAH SISWA:", data?.length);
+  console.log("ERROR:", error);
 
   if (!error) {
     allData.students = data;
@@ -988,12 +989,17 @@ async function testConnection() {
 // --- START APP ---
 window.addEventListener('DOMContentLoaded', async () => {
 
+  console.log("START APP");
+
   await loadStudentsFromSupabase();
+
+  console.log("SETELAH LOAD:", allData.students.length);
 
   initApp();
 
   renderStudents();
   updateClassDropdowns();
+
 });
   </script>
 </body>
