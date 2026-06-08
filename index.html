@@ -384,11 +384,9 @@ const supabaseClient = supabase.createClient(
  async function loadStudentsFromSupabase() {
   const { data, error } = await supabaseClient
     .from('students')
-    .select('*');
-
-  console.log("DATA SUPABASE:", data);
-  console.log("JUMLAH SISWA:", data?.length);
-  console.log("ERROR:", error);
+    .select('*')
+    .order('student_class', { ascending: true })
+    .order('student_name', { ascending: true });
 
   if (!error) {
     allData.students = data;
@@ -511,8 +509,13 @@ function initApp() {
     // --- LOGIKA MANAJEMEN SISWA ---
     function renderStudents() {
       const filterClass = document.getElementById('filter-student-class').value;
-      let students = allData.students;
-      if (filterClass) students = students.filter(s => s.student_class === filterClass);
+  let students = allData.students;
+students = students.sort((a, b) =>
+  a.student_name.localeCompare(b.student_name, 'id')
+);
+
+if (filterClass)
+  students = students.filter(s => s.student_class === filterClass);
 
       const tbody = document.getElementById('student-table-body');
       document.getElementById('total-students-count').textContent = students.length;
