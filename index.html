@@ -995,13 +995,6 @@ async function testConnection() {
 // --- START APP ---
 window.addEventListener('DOMContentLoaded', async () => {
   initApp();
-
-  await loadStudentsFromSupabase();
-
-  renderStudents();
-  updateClassDropdowns();
-
-  await testConnection();
 });
   </script>
 </body>
