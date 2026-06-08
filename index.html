@@ -391,16 +391,17 @@ const supabaseClient = supabase.createClient(
   }
 }
     // --- INISIALISASI ---
-    function initApp() {
-      // Load data from local storage
-      const savedData = localStorage.getItem(STORAGE_KEY);
-      if (savedData) {
-        try {
-          allData = JSON.parse(savedData);
-        } catch (e) {
-          console.error("Data corrupt, resetting...");
-        }
-      }
+function initApp() {
+
+  document.getElementById('login-school-name').textContent = CONFIG.school_name;
+  document.getElementById('header-school-name').textContent = CONFIG.school_name;
+  document.getElementById('dashboard-teacher-name').textContent = CONFIG.teacher_name;
+  document.getElementById('dashboard-subject').textContent = CONFIG.subject_name;
+
+  setupEventListeners();
+
+  updateClassDropdowns();
+}
       
       // Set UI Texts
       document.getElementById('login-school-name').textContent = CONFIG.school_name;
