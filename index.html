@@ -381,10 +381,13 @@ const supabaseClient = supabase.createClient(
       journals: []
     };
 
-    async function loadStudentsFromSupabase() {
+ async function loadStudentsFromSupabase() {
   const { data, error } = await supabaseClient
     .from('students')
     .select('*');
+
+  console.log("DATA SUPABASE:", data);
+  console.log("ERROR SUPABASE:", error);
 
   if (!error) {
     allData.students = data;
