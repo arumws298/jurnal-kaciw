@@ -536,7 +536,7 @@ function initApp() {
       `).join('');
     }
 
-   async function addStudent(e) {
+async function addStudent(e) {
   e.preventDefault();
 
   const newStudent = {
@@ -546,26 +546,24 @@ function initApp() {
   };
 
   const { error } = await supabaseClient
-  .from('students')
-  .insert(studentsToInsert);
-
-console.log("HASIL INSERT:", error);
-console.log("JUMLAH DATA:", studentsToInsert.length);
+    .from('students')
+    .insert([newStudent]);
 
   if (error) {
     console.error(error);
-    showToast("Gagal menyimpan Data");
+    showToast("Gagal menyimpan data");
     return;
   }
 
-showToast("Siswa berhasil ditambahkan");
+  await loadStudentsFromSupabase();
 
-await loadStudentsFromSupabase();
-renderStudents();
-updateClassDropdowns();
+  renderStudents();
+  updateClassDropdowns();
 
-document.getElementById('form-add-student').reset();
-closeModal('modal-add-student');
+  document.getElementById('form-add-student').reset();
+  closeModal('modal-add-student');
+
+  showToast("Siswa berhasil ditambahkan");
 }
 
     let deleteTarget = null;
@@ -574,32 +572,51 @@ closeModal('modal-add-student');
       openModal('modal-confirm');
     }
     
-    function executeDelete() {
-      if (!deleteTarget) return;
-      if (deleteTarget.type === 'student') {
-        allData.students = allData.students.filter(s => s.id !== deleteTarget.id);
-        renderStudents();
-        showToast("Siswa dihapus");
-      } else if (deleteTarget.type === 'journal') {
-        allData.journals = allData.journals.filter(j => j.id !== deleteTarget.id);
-        renderRekapJurnal();
-        showToast("Jurnal dihapus");
-      }
-      saveData();
-      closeModal('modal-confirm');
-      deleteTarget = null;
-    }
+  async function executeDelete() {
 
-    function deleteAllStudents() {
-      if (confirm("Yakin hapus SEMUA data siswa?")) {
-        allData.students = [];
-        saveData();
-        renderStudents();
-        updateClassDropdowns();
-        showToast("Semua data siswa dihapus");
-      }
+  if (!deleteTarget) return;
+  if (deleteTarget.type === 'student') {
+    const { error } = await supabaseClient
+      .from('students')
+      .delete()
+      .eq('id', deleteTarget.id);
+    if (error) {
+      console.error(error);
+      showToast("Gagal menghapus siswa");
+      return;
     }
+    await loadStudentsFromSupabase();
+    renderStudents();
+    updateClassDropdowns();
+    showToast("Siswa dihapus");
+  }
 
+  closeModal('modal-confirm');
+  deleteTarget = null;
+}
+
+async function deleteAllStudents() {
+
+  if (!confirm("Yakin hapus SEMUA data siswa?")) return;
+
+  const { error } = await supabaseClient
+    .from('students')
+    .delete()
+    .neq('id', 0);
+
+  if (error) {
+    console.error(error);
+    showToast("Gagal menghapus data");
+    return;
+  }
+
+  await loadStudentsFromSupabase();
+
+  renderStudents();
+  updateClassDropdowns();
+
+  showToast("Semua data siswa dihapus");
+}
     // --- IMPORT EXCEL ---
     function downloadTemplate() {
       const ws_data = [["Nama Siswa", "Kelas"], ["Contoh: Ahmad", "X MP 1"]];
