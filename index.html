@@ -402,20 +402,6 @@ function initApp() {
 
   updateClassDropdowns();
 }
-      
-      // Set UI Texts
-      document.getElementById('login-school-name').textContent = CONFIG.school_name;
-      document.getElementById('header-school-name').textContent = CONFIG.school_name;
-      document.getElementById('dashboard-teacher-name').textContent = CONFIG.teacher_name;
-      document.getElementById('dashboard-subject').textContent = CONFIG.subject_name;
-      
-      // Setup Listeners
-      setupEventListeners();
-      
-      // Render initial UI
-      updateClassDropdowns();
-    }
-
     // --- FUNGSI UTAMA PENYIMPANAN ---
     function saveData() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
