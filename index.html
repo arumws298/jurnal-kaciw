@@ -611,37 +611,54 @@ const supabaseClient = supabase.createClient(
       XLSX.writeFile(wb, "Template_Siswa_KACIW.xlsx");
     }
 
-    function importExcel(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, {type: 'array'});
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet);
-        
-        let count = 0;
-        json.forEach(row => {
-          if (row['Nama Siswa'] && row['Kelas']) {
-            allData.students.push({
-              id: generateId(),
-              student_name: row['Nama Siswa'],
-              student_class: row['Kelas'],
-              created_at: new Date().toISOString()
-            });
-            count++;
-          }
+   async function importExcel(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = async function(event) {
+    const data = new Uint8Array(event.target.result);
+
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    const json = XLSX.utils.sheet_to_json(sheet);
+
+    const studentsToInsert = [];
+
+    json.forEach(row => {
+      if (row['Nama Siswa'] && row['Kelas']) {
+        studentsToInsert.push({
+          student_name: row['Nama Siswa'],
+          student_class: row['Kelas'],
+          created_at: new Date().toISOString()
         });
-        saveData();
-        renderStudents();
-        updateClassDropdowns();
-        showToast(`${count} siswa berhasil diimport!`);
-        e.target.value = ''; // Reset input
-      };
-      reader.readAsArrayBuffer(file);
+      }
+    });
+
+    const { error } = await supabaseClient
+      .from('students')
+      .insert(studentsToInsert);
+
+    if (error) {
+      alert('Gagal import: ' + error.message);
+      console.error(error);
+      return;
     }
 
+    showToast(`${studentsToInsert.length} siswa berhasil diupload ke Supabase!`);
+
+    await loadStudentsFromSupabase();
+
+    renderStudents();
+    updateClassDropdowns();
+
+    e.target.value = '';
+  };
+
+  reader.readAsArrayBuffer(file);
+}
     // --- LOGIKA PRESENSI ---
     function renderAttendanceList() {
       const classVal = document.getElementById('select-attendance-class').value;
