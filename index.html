@@ -542,19 +542,21 @@ function initApp() {
   };
 
   const { error } = await supabaseClient
-    .from('students')
-    .insert([newStudent]);
+  .from('students')
+  .insert(studentsToInsert);
+
+console.log("HASIL INSERT:", error);
+console.log("JUMLAH DATA:", studentsToInsert.length);
 
   if (error) {
     console.error(error);
-    showToast("Gagal menyimpan ke Supabase");
+    showToast("Gagal menyimpan Data");
     return;
   }
 
 showToast("Siswa berhasil ditambahkan");
 
 await loadStudentsFromSupabase();
-
 renderStudents();
 updateClassDropdowns();
 
@@ -603,7 +605,7 @@ closeModal('modal-add-student');
       XLSX.writeFile(wb, "Template_Siswa_KACIW.xlsx");
     }
 
-   async function importExcel(e) {
+async function importExcel(e) {
   const file = e.target.files[0];
   if (!file) return;
 
@@ -632,7 +634,10 @@ closeModal('modal-add-student');
     const { error } = await supabaseClient
       .from('students')
       .insert(studentsToInsert);
-
+    
+console.log("DATA IMPORT:", studentsToInsert);
+console.log("ERROR:", error);
+    
     if (error) {
       alert('Gagal import: ' + error.message);
       console.error(error);
@@ -642,7 +647,6 @@ closeModal('modal-add-student');
     showToast(`${studentsToInsert.length} siswa berhasil diupload ke Supabase!`);
 
     await loadStudentsFromSupabase();
-
     renderStudents();
     updateClassDropdowns();
 
