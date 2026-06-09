@@ -386,6 +386,27 @@ const supabaseClient = supabase.createClient(
     };
 
  async function loadStudentsFromSupabase() {
+  async function loadAttendanceFromSupabase() {
+
+  const { data, error } = await supabaseClient
+    .from('attendance')
+    .select('*');
+
+  if (!error) {
+    allData.attendance = data;
+  }
+}
+
+async function loadJournalsFromSupabase() {
+
+  const { data, error } = await supabaseClient
+    .from('journals')
+    .select('*');
+
+  if (!error) {
+    allData.journals = data;
+  }
+}
   const { data, error } = await supabaseClient
     .from('students')
     .select('*')
@@ -395,6 +416,16 @@ const supabaseClient = supabase.createClient(
   if (!error) {
     allData.students = data;
   }
+   async function loadJournalsFromSupabase() {
+
+  const { data, error } = await supabaseClient
+    .from('journals')
+    .select('*');
+
+  if (!error) {
+    allData.journals = data;
+  }
+}
 }
     // --- INISIALISASI ---
 function initApp() {
@@ -813,33 +844,46 @@ console.log("ERROR:", error);
       }).join('');
     }
 
-    function saveAttendance() {
-      const classVal = document.getElementById('select-attendance-class').value;
-      const dateVal = document.getElementById('input-attendance-date').value;
-      const selects = document.querySelectorAll('.attendance-status');
-      
-      if (selects.length === 0) {
-        showToast("Semua siswa sudah diabsen atau tidak ada data.");
-        return;
-      }
+  async function saveAttendance() {
 
-      let count = 0;
-      selects.forEach(sel => {
-        allData.attendance.push({
-          id: generateId(),
-          student_name: sel.dataset.name,
-          attendance_class: classVal,
-          attendance_date: dateVal,
-          attendance_status: sel.value,
-          created_at: new Date().toISOString()
-        });
-        count++;
-      });
+  const classVal = document.getElementById('select-attendance-class').value;
+  const dateVal = document.getElementById('input-attendance-date').value;
+  const selects = document.querySelectorAll('.attendance-status');
 
-      saveData();
-      renderAttendanceList();
-      showToast(`${count} presensi berhasil disimpan!`);
-    }
+  if (selects.length === 0) {
+    showToast("Semua siswa sudah diabsen atau tidak ada data.");
+    return;
+  }
+
+  const attendanceData = [];
+
+  selects.forEach(sel => {
+    attendanceData.push({
+      student_name: sel.dataset.name,
+      attendance_class: classVal,
+      attendance_date: dateVal,
+      attendance_status: sel.value,
+      created_at: new Date().toISOString()
+    });
+  });
+
+  const { error } = await supabaseClient
+    .from('attendance')
+    .insert(attendanceData);
+
+  if (error) {
+    console.error(error);
+    showToast("Gagal menyimpan presensi");
+    return;
+  }
+
+  showToast(`${attendanceData.length} presensi berhasil disimpan!`);
+
+  await loadAttendanceFromSupabase();
+
+  renderAttendanceList();
+  renderRekapPresensi();
+}
 
     function deleteAttendance(id) {
       allData.attendance = allData.attendance.filter(a => a.id !== id);
@@ -935,28 +979,37 @@ console.log("ERROR:", error);
       `).join('');
     }
 
-    function addJournal(e) {
-      e.preventDefault();
-      allData.journals.push({
-        id: generateId(),
-        journal_date: document.getElementById('input-journal-date').value,
-        journal_time: document.getElementById('input-journal-time').value,
-        journal_class: document.getElementById('input-journal-class').value,
-        journal_topic: document.getElementById('input-journal-topic').value,
-        journal_activity: document.getElementById('input-journal-activity').value,
-        created_at: new Date().toISOString()
-      });
-      saveData();
-      closeModal('modal-add-journal');
-      document.getElementById('form-add-journal').reset();
-      showToast("Jurnal berhasil ditambahkan");
-      renderRekapJurnal();
-    }
+  async function addJournal(e) {
 
-    function confirmDeleteJournal(id) {
-      deleteTarget = { type: 'journal', id: id };
-      openModal('modal-confirm');
-    }
+  e.preventDefault();
+
+  const journalData = {
+    journal_date: document.getElementById('input-journal-date').value,
+    journal_time: document.getElementById('input-journal-time').value,
+    journal_class: document.getElementById('input-journal-class').value,
+    journal_topic: document.getElementById('input-journal-topic').value,
+    journal_activity: document.getElementById('input-journal-activity').value,
+    created_at: new Date().toISOString()
+  };
+
+  const { error } = await supabaseClient
+    .from('journals')
+    .insert([journalData]);
+
+  if (error) {
+    console.error(error);
+    showToast("Gagal menyimpan jurnal");
+    return;
+  }
+
+  await loadJournalsFromSupabase();
+
+  closeModal('modal-add-journal');
+  document.getElementById('form-add-journal').reset();
+
+  renderRekapJurnal();
+  showToast("Jurnal berhasil ditambahkan");
+}
 
     // --- PDF GENERATION ---
     function addSignatures(doc, y) {
@@ -1132,17 +1185,14 @@ async function testConnection() {
 // --- START APP ---
 window.addEventListener('DOMContentLoaded', async () => {
 
-  console.log("START APP");
-
   await loadStudentsFromSupabase();
-
-  console.log("SETELAH LOAD:", allData.students.length);
+  await loadAttendanceFromSupabase();
+  await loadJournalsFromSupabase();
 
   initApp();
 
   renderStudents();
   updateClassDropdowns();
-
 });
   </script>
 </body>
