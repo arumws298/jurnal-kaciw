@@ -606,11 +606,16 @@ async function addStudent(e) {
 
     let deleteTarget = null;
     function confirmDeleteStudent(id) {
-      deleteTarget = { type: 'student', id: id };
-      openModal('modal-confirm');
-    }
+      
+    function confirmDeleteAllStudents() {
+
+  deleteTarget = {
+    type: 'all_students'
+  };
+  openModal('modal-confirm');
+}
     
-  async function executeDelete() {
+ async function executeDelete() {
 
   if (!deleteTarget) return;
 
@@ -642,10 +647,53 @@ async function addStudent(e) {
     showToast("Siswa dihapus");
   }
 
+  else if (deleteTarget.type === 'all_students') {
+
+    const { error } = await supabaseClient
+      .from('students')
+      .delete()
+      .gt('created_at', '1900-01-01');
+
+    if (error) {
+      console.error(error);
+      showToast("Gagal menghapus semua siswa");
+      return;
+    }
+
+    await loadStudentsFromSupabase();
+
+    renderStudents();
+    updateClassDropdowns();
+
+    showToast("Semua siswa berhasil dihapus");
+  }
+
   closeModal('modal-confirm');
   deleteTarget = null;
 }
+else if (deleteTarget.type === 'class_students') {
 
+  const { error } = await supabaseClient
+    .from('students')
+    .delete()
+    .eq('student_class', deleteTarget.className);
+
+  if (error) {
+    console.error(error);
+    showToast("Gagal menghapus kelas");
+    return;
+  }
+
+  await loadStudentsFromSupabase();
+
+  renderStudents();
+  updateClassDropdowns();
+
+  showToast(
+    `Kelas ${deleteTarget.className} berhasil dihapus`
+  );
+}
+    
 async function deleteAllStudents() {
 
   if (!confirm("Yakin hapus SEMUA data siswa?")) return;
@@ -670,7 +718,6 @@ async function deleteAllStudents() {
 }
     
 async function deleteClassStudents() {
-
   const selectedClass =
     document.getElementById('filter-student-class').value;
 
@@ -759,7 +806,6 @@ console.log("ERROR:", error);
   };
 
   async function deleteClassStudents() {
-
   const selectedClass =
     document.getElementById('filter-student-class').value;
 
@@ -768,30 +814,12 @@ console.log("ERROR:", error);
     return;
   }
 
-  if (!confirm(
-      `Hapus seluruh siswa kelas ${selectedClass}?`
-  )) return;
+  deleteTarget = {
+    type: 'class_students',
+    className: selectedClass
+  };
 
-  const { error } = await supabaseClient
-    .from('students')
-    .delete()
-    .eq('student_class', selectedClass);
-
-  if (error) {
-    console.error(error);
-    showToast("Gagal menghapus kelas");
-    return;
-  }
-
-  await loadStudentsFromSupabase();
-
-  updateClassDropdowns();
-  renderStudents();
-
-  showToast(`Kelas ${selectedClass} berhasil dihapus`);
-}
-
-  reader.readAsArrayBuffer(file);
+  openModal('modal-confirm');
 }
     // --- LOGIKA PRESENSI ---
     function renderAttendanceList() {
@@ -1148,7 +1176,7 @@ doc.addImage(img,'PNG',10,5,190,35);
       document.getElementById('filter-student-class').addEventListener('change', renderStudents);
       document.getElementById('btn-add-student-manual').addEventListener('click', () => openModal('modal-add-student'));
       document.getElementById('form-add-student').addEventListener('submit', addStudent);
-      document.getElementById('btn-delete-all-students').addEventListener('click', deleteAllStudents);
+     document.getElementById('btn-delete-all-students').addEventListener('click', confirmDeleteAllStudents);
       document.getElementById('btn-download-template').addEventListener('click', downloadTemplate);
       document.getElementById('input-import-excel').addEventListener('change', importExcel);
       document.getElementById('btn-confirm-delete-action').addEventListener('click', executeDelete);
