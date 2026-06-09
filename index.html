@@ -385,9 +385,17 @@ const supabaseClient = supabase.createClient(
       journals: []
     };
 
- async function loadStudentsFromSupabase() {
-  async function loadAttendanceFromSupabase() {
+async function loadStudentsFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from('students')
+    .select('*');
 
+  if (!error) {
+    allData.students = data;
+  }
+}
+
+async function loadAttendanceFromSupabase() {
   const { data, error } = await supabaseClient
     .from('attendance')
     .select('*');
@@ -398,7 +406,6 @@ const supabaseClient = supabase.createClient(
 }
 
 async function loadJournalsFromSupabase() {
-
   const { data, error } = await supabaseClient
     .from('journals')
     .select('*');
@@ -406,26 +413,6 @@ async function loadJournalsFromSupabase() {
   if (!error) {
     allData.journals = data;
   }
-}
-  const { data, error } = await supabaseClient
-    .from('students')
-    .select('*')
-    .order('student_class', { ascending: true })
-    .order('student_name', { ascending: true });
-
-  if (!error) {
-    allData.students = data;
-  }
-   async function loadJournalsFromSupabase() {
-
-  const { data, error } = await supabaseClient
-    .from('journals')
-    .select('*');
-
-  if (!error) {
-    allData.journals = data;
-  }
-}
 }
     // --- INISIALISASI ---
 function initApp() {
@@ -1213,9 +1200,9 @@ async function testConnection() {
 // --- START APP ---
 window.addEventListener('DOMContentLoaded', async () => {
 
-  await loadStudentsFromSupabase();
-  await loadAttendanceFromSupabase();
-  await loadJournalsFromSupabase();
+await loadStudentsFromSupabase();
+await loadAttendanceFromSupabase();
+await loadJournalsFromSupabase();
 
   initApp();
 
