@@ -591,14 +591,39 @@ async function addStudent(e) {
   showToast("Siswa berhasil ditambahkan");
 }
 
-    let deleteTarget = null;
-    function confirmDeleteStudent(id) {
-      
-    function confirmDeleteAllStudents() {
+let deleteTarget = null;
 
+function confirmDeleteStudent(id) {
+  deleteTarget = {
+    type: 'student',
+    id: id
+  };
+
+  openModal('modal-confirm');
+}
+
+function confirmDeleteAllStudents() {
   deleteTarget = {
     type: 'all_students'
   };
+
+  openModal('modal-confirm');
+}
+function confirmDeleteClassStudents() {
+
+  const selectedClass =
+    document.getElementById('filter-student-class').value;
+
+  if (!selectedClass) {
+    showToast("Pilih kelas terlebih dahulu");
+    return;
+  }
+
+  deleteTarget = {
+    type: 'class_students',
+    className: selectedClass
+  };
+
   openModal('modal-confirm');
 }
     
@@ -657,8 +682,6 @@ async function addStudent(e) {
 
   closeModal('modal-confirm');
   deleteTarget = null;
-}
-else if (deleteTarget.type === 'class_students') {
 
   const { error } = await supabaseClient
     .from('students')
@@ -791,7 +814,8 @@ console.log("ERROR:", error);
 
     e.target.value = '';
   };
-
+reader.readAsArrayBuffer(file);
+}
   async function deleteClassStudents() {
   const selectedClass =
     document.getElementById('filter-student-class').value;
@@ -1163,11 +1187,11 @@ doc.addImage(img,'PNG',10,5,190,35);
       document.getElementById('filter-student-class').addEventListener('change', renderStudents);
       document.getElementById('btn-add-student-manual').addEventListener('click', () => openModal('modal-add-student'));
       document.getElementById('form-add-student').addEventListener('submit', addStudent);
-     document.getElementById('btn-delete-all-students').addEventListener('click', confirmDeleteAllStudents);
+      document.getElementById('btn-delete-all-students').addEventListener('click', confirmDeleteAllStudents);
       document.getElementById('btn-download-template').addEventListener('click', downloadTemplate);
       document.getElementById('input-import-excel').addEventListener('change', importExcel);
       document.getElementById('btn-confirm-delete-action').addEventListener('click', executeDelete);
-      document.getElementById('btn-delete-class-students').addEventListener('click', deleteClassStudents);
+      document.getElementById('btn-delete-class-students').addEventListener('click', confirmDeleteClassStudents);;
 
       // Attendance
       document.getElementById('select-attendance-class').addEventListener('change', renderAttendanceList);
