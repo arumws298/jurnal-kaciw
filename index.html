@@ -182,6 +182,7 @@
             <button id="btn-download-template" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md"> ↓ Template Excel </button> 
             <label class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-4 rounded-xl transition-all text-center cursor-pointer shadow-md"> 📁 Import Excel <input type="file" id="input-import-excel" accept=".xlsx,.xls" class="hidden"> </label> 
             <button id="btn-delete-all-students" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md"> × Hapus Semua </button>
+            <button id="btn-delete-class-students" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md"> 🗑 Hapus Kelas Ini </button>
           </div>
 
           <!-- Filter Section -->
@@ -578,19 +579,32 @@ async function addStudent(e) {
   async function executeDelete() {
 
   if (!deleteTarget) return;
+
+  const selectedClass =
+    document.getElementById('filter-student-class').value;
+
   if (deleteTarget.type === 'student') {
+
     const { error } = await supabaseClient
       .from('students')
       .delete()
       .eq('id', deleteTarget.id);
+
     if (error) {
       console.error(error);
       showToast("Gagal menghapus siswa");
       return;
     }
+
     await loadStudentsFromSupabase();
-    renderStudents();
+
     updateClassDropdowns();
+
+    document.getElementById('filter-student-class').value =
+      selectedClass;
+
+    renderStudents();
+
     showToast("Siswa dihapus");
   }
 
@@ -619,6 +633,39 @@ async function deleteAllStudents() {
   updateClassDropdowns();
 
   showToast("Semua data siswa dihapus");
+}
+    
+async function deleteClassStudents() {
+
+  const selectedClass =
+    document.getElementById('filter-student-class').value;
+
+  if (!selectedClass) {
+    showToast("Pilih kelas terlebih dahulu");
+    return;
+  }
+
+  if (!confirm(
+      `Hapus seluruh siswa kelas ${selectedClass}?`
+  )) return;
+
+  const { error } = await supabaseClient
+    .from('students')
+    .delete()
+    .eq('student_class', selectedClass);
+
+  if (error) {
+    console.error(error);
+    showToast("Gagal menghapus kelas");
+    return;
+  }
+
+  await loadStudentsFromSupabase();
+
+  updateClassDropdowns();
+  renderStudents();
+
+  showToast(`Kelas ${selectedClass} Berhasil dihapus`);
 }
     // --- IMPORT EXCEL ---
     function downloadTemplate() {
@@ -676,6 +723,39 @@ console.log("ERROR:", error);
 
     e.target.value = '';
   };
+
+  async function deleteClassStudents() {
+
+  const selectedClass =
+    document.getElementById('filter-student-class').value;
+
+  if (!selectedClass) {
+    showToast("Pilih kelas terlebih dahulu");
+    return;
+  }
+
+  if (!confirm(
+      `Hapus seluruh siswa kelas ${selectedClass}?`
+  )) return;
+
+  const { error } = await supabaseClient
+    .from('students')
+    .delete()
+    .eq('student_class', selectedClass);
+
+  if (error) {
+    console.error(error);
+    showToast("Gagal menghapus kelas");
+    return;
+  }
+
+  await loadStudentsFromSupabase();
+
+  updateClassDropdowns();
+  renderStudents();
+
+  showToast(`Kelas ${selectedClass} berhasil dihapus`);
+}
 
   reader.readAsArrayBuffer(file);
 }
@@ -977,6 +1057,7 @@ console.log("ERROR:", error);
       document.getElementById('btn-download-template').addEventListener('click', downloadTemplate);
       document.getElementById('input-import-excel').addEventListener('change', importExcel);
       document.getElementById('btn-confirm-delete-action').addEventListener('click', executeDelete);
+      document.getElementById('btn-delete-class-students').addEventListener('click', deleteClassStudents);
 
       // Attendance
       document.getElementById('select-attendance-class').addEventListener('change', renderAttendanceList);
