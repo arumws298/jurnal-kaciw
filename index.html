@@ -622,7 +622,7 @@ async function deleteAllStudents() {
   const { error } = await supabaseClient
     .from('students')
     .delete()
-    .neq('id', 0);
+    .not('id', 'is', null);
 
   if (error) {
     console.error(error);
@@ -631,11 +631,9 @@ async function deleteAllStudents() {
   }
 
   await loadStudentsFromSupabase();
-
   renderStudents();
   updateClassDropdowns();
-
-  showToast("Semua data siswa dihapus");
+  showToast("Semua data siswa berhasil dihapus");
 }
     
 async function deleteClassStudents() {
