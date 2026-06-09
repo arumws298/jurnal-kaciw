@@ -364,6 +364,9 @@ const supabaseClient = supabase.createClient(
   supabaseUrl,
   supabaseKey
 );
+    const KOP_URL =
+'https://raw.githubusercontent.com/arumws298/jurnal-kaciw/main/kop-sekolah.png';
+    
     const CONFIG = {
       school_name: 'SMKN 9 Kabupaten Tangerang',
       teacher_name: 'Arum Widya Safitri, S.Pd',
@@ -975,16 +978,49 @@ console.log("ERROR:", error);
       doc.text(`NIP. ${CONFIG.teacher_nip}`, 130, y+35);
     }
 
-    function downloadPresensiPDF() {
+    async function downloadPresensiPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
+      const img = await fetch(KOP_URL)
+  .then(res => res.blob())
+  .then(blob => new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  }));
+
+doc.addImage(img,'PNG',10,5,190,35);
       
-      // Header
-      doc.setFontSize(16); doc.setFont(undefined, 'bold');
-      doc.text("LAPORAN PRESENSI SISWA", 105, 15, {align:'center'});
-      doc.setFontSize(12); doc.setFont(undefined, 'normal');
-      doc.text(CONFIG.school_name, 105, 22, {align:'center'});
-      doc.text(`Mata Pelajaran: ${CONFIG.subject_name}`, 105, 28, {align:'center'});
+     // KOP SURAT
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text("PEMERINTAH PROVINSI BANTEN", 105, 10, { align: 'center' });
+
+    doc.text("DINAS PENDIDIKAN DAN KEBUDAYAAN", 105, 16, { align: 'center' });
+
+    doc.setFontSize(14);
+    doc.text("SMK NEGERI 9 KABUPATEN TANGERANG", 105, 23, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+
+    doc.text(
+      "Perum Argo Subur, Ds.Pasanggrahan Kec. Solear Kab. Tangerang",
+      105,
+      29,
+      { align: 'center' }
+    );
+    
+    doc.line(10, 35, 200, 35);
+
+    // JUDUL
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text("LAPORAN PRESENSI SISWA", 105, 50, { align: 'center' });
+    
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`, 14, 55);
 
       // Data
       const data = allData.attendance.map(a => [
@@ -992,7 +1028,7 @@ console.log("ERROR:", error);
       ]);
 
       doc.autoTable({
-        startY: 35, head: [['Tanggal', 'Nama', 'Kelas', 'Status']],
+        startY: 60, head: [['Tanggal', 'Nama', 'Kelas', 'Status']],
         body: data, theme: 'grid', headStyles: {fillColor: [30, 64, 175]}
       });
 
@@ -1003,22 +1039,16 @@ console.log("ERROR:", error);
       doc.save('Laporan_Presensi_KACIW.pdf');
     }
 
-    function downloadJurnalPDF() {
+    async function downloadJurnalPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      const img = new Image();
+     const img = await fetch(KOP_URL).then(res => res.blob()).then(blob => new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  }));
 
-img.src = 'kop-sekolah.png';
-
-doc.addImage(
-  img,
-  'PNG',
-  10,
-  5,
-  190,
-  35
-);
-
+      doc.addImage(img,'PNG',10,5,190,35);
       doc.setFontSize(16); doc.setFont(undefined, 'bold');
       doc.text("JURNAL MENGAJAR GURU", 105, 15, {align:'center'});
       doc.setFontSize(12); doc.setFont(undefined, 'normal');
@@ -1030,7 +1060,7 @@ doc.addImage(
       ]);
 
       doc.autoTable({
-        startY: 35, head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
+        startY: 60, head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
         body: data, theme: 'grid', headStyles: {fillColor: [30, 64, 175]}
       });
 
