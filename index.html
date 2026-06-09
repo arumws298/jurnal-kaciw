@@ -622,18 +622,20 @@ async function deleteAllStudents() {
   const { error } = await supabaseClient
     .from('students')
     .delete()
-    .not('id', 'is', null);
+    .gt('created_at', '1900-01-01');
 
   if (error) {
     console.error(error);
-    showToast("Gagal menghapus data");
+    alert(error.message);
     return;
   }
 
+  showToast("Semua data siswa berhasil dihapus");
+
   await loadStudentsFromSupabase();
+
   renderStudents();
   updateClassDropdowns();
-  showToast("Semua data siswa berhasil dihapus");
 }
     
 async function deleteClassStudents() {
