@@ -627,7 +627,7 @@ function confirmDeleteClassStudents() {
   openModal('modal-confirm');
 }
     
- async function executeDelete() {
+async function executeDelete() {
 
   if (!deleteTarget) return;
 
@@ -658,7 +658,28 @@ function confirmDeleteClassStudents() {
 
     showToast("Siswa dihapus");
   }
+    
+else if (deleteTarget.type === 'class_students') {
 
+  const { error } = await supabaseClient
+    .from('students')
+    .delete()
+    .eq('student_class', deleteTarget.className);
+
+  if (error) {
+    console.error(error);
+    showToast("Gagal menghapus kelas");
+    return;
+  }
+
+  await loadStudentsFromSupabase();
+
+  renderStudents();
+  updateClassDropdowns();
+
+  showToast(`Kelas ${deleteTarget.className} berhasil dihapus`);
+}
+    
   else if (deleteTarget.type === 'all_students') {
 
     const { error } = await supabaseClient
@@ -682,26 +703,6 @@ function confirmDeleteClassStudents() {
 
   closeModal('modal-confirm');
   deleteTarget = null;
-
-  const { error } = await supabaseClient
-    .from('students')
-    .delete()
-    .eq('student_class', deleteTarget.className);
-
-  if (error) {
-    console.error(error);
-    showToast("Gagal menghapus kelas");
-    return;
-  }
-
-  await loadStudentsFromSupabase();
-
-  renderStudents();
-  updateClassDropdowns();
-
-  showToast(
-    `Kelas ${deleteTarget.className} berhasil dihapus`
-  );
 }
     
 async function deleteAllStudents() {
