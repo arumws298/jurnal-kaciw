@@ -733,38 +733,7 @@ async function deleteAllStudents() {
   renderStudents();
   updateClassDropdowns();
 }
-    
-async function deleteClassStudents() {
-  const selectedClass =
-    document.getElementById('filter-student-class').value;
-
-  if (!selectedClass) {
-    showToast("Pilih kelas terlebih dahulu");
-    return;
-  }
-
-  if (!confirm(
-      `Hapus seluruh siswa kelas ${selectedClass}?`
-  )) return;
-
-  const { error } = await supabaseClient
-    .from('students')
-    .delete()
-    .eq('student_class', selectedClass);
-
-  if (error) {
-    console.error(error);
-    showToast("Gagal menghapus kelas");
-    return;
-  }
-
-  await loadStudentsFromSupabase();
-
-  updateClassDropdowns();
-  renderStudents();
-
-  showToast(`Kelas ${selectedClass} Berhasil dihapus`);
-}
+  
     // --- IMPORT EXCEL ---
     function downloadTemplate() {
       const ws_data = [["Nama Siswa", "Kelas"], ["Contoh: Ahmad", "X MP 1"]];
@@ -843,7 +812,7 @@ reader.readAsArrayBuffer(file);
     function renderAttendanceList() {
       const classVal = document.getElementById('select-attendance-class').value;
       const dateVal = document.getElementById('input-attendance-date').value;
-      const container = document.getElementById('attendance-list-container');
+      const container = document.getElementById('attendance-list');
       const emptyState = document.getElementById('attendance-empty-state');
 
       if (!classVal || !dateVal) {
@@ -931,22 +900,60 @@ reader.readAsArrayBuffer(file);
   renderRekapPresensi();
 }
 
-    function deleteAttendance(id) {
-      allData.attendance = allData.attendance.filter(a => a.id !== id);
-      saveData();
-      renderAttendanceList();
-    }
+async function deleteAttendance(id) {
+
+  const { error } = await supabaseClient
+    .from('attendance')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error(error);
+    showToast("Gagal menghapus presensi");
+    return;
+  }
+
+  await loadAttendanceFromSupabase();
+  renderAttendanceList();
+  renderRekapPresensi();
+  showToast("Presensi berhasil dihapus");
+}
     
-    function resetAttendance() {
-      if(confirm("Hapus semua data presensi untuk kelas dan tanggal ini?")) {
-        const classVal = document.getElementById('select-attendance-class').value;
-        const dateVal = document.getElementById('input-attendance-date').value;
-        allData.attendance = allData.attendance.filter(a => !(a.attendance_class === classVal && a.attendance_date === dateVal));
-        saveData();
-        renderAttendanceList();
-        showToast("Data presensi di-reset");
-      }
-    }
+    async function resetAttendance() {
+
+  const classVal =
+    document.getElementById('select-attendance-class').value;
+
+  const dateVal =
+    document.getElementById('input-attendance-date').value;
+
+  if (!classVal || !dateVal) {
+    showToast("Pilih kelas dan tanggal");
+    return;
+  }
+
+  if (!confirm("Hapus semua presensi kelas ini?"))
+    return;
+
+  const { error } = await supabaseClient
+    .from('attendance')
+    .delete()
+    .eq('attendance_class', classVal)
+    .eq('attendance_date', dateVal);
+
+  if (error) {
+    console.error(error);
+    showToast("Gagal menghapus presensi");
+    return;
+  }
+
+  await loadAttendanceFromSupabase();
+
+  renderAttendanceList();
+  renderRekapPresensi();
+
+  showToast("Presensi berhasil dihapus");
+}
 
     // --- LOGIKA REKAP PRESENSI ---
     function renderRekapPresensi() {
