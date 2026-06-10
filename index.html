@@ -674,10 +674,16 @@ else if (deleteTarget.type === 'class_students') {
 
   await loadStudentsFromSupabase();
 
-  renderStudents();
   updateClassDropdowns();
 
-  showToast(`Kelas ${deleteTarget.className} berhasil dihapus`);
+  // RESET FILTER
+  document.getElementById('filter-student-class').value = '';
+
+  renderStudents();
+
+  showToast(
+    `Kelas ${deleteTarget.className} berhasil dihapus`
+  );
 }
     
   else if (deleteTarget.type === 'all_students') {
