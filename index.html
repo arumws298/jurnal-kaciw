@@ -1244,6 +1244,7 @@ doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
 // --- DOWNLOAD PDF BULANAN ---
   async function downloadJurnalMonthlyPDF() {
   const bulan = document.getElementById('filter-jurnal-month').value;
+  const kelas =document.getElementById('filter-jurnal-class').value;
 
   if (!bulan) {
     showToast("Pilih bulan terlebih dahulu");
@@ -1282,8 +1283,6 @@ doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
   doc.text(`Nama : ${CONFIG.teacher_name}`,14,69);
   doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`,14,75);
 
-  const kelas =document.getElementById('filter-jurnal-class').value;
-
 const jurnal = allData.journals.filter(j => {
     const cocokBulan = j.journal_date.startsWith(bulan);
     const cocokKelas = kelas ? j.journal_class === kelas : true;
@@ -1320,6 +1319,7 @@ const jurnal = allData.journals.filter(j => {
 async function downloadPresensiMonthlyPDF() {
 
   const bulan = document.getElementById('filter-rekap-month').value;
+  const kelas =document.getElementById('filter-rekap-class').value;
 
   if (!bulan) {
     showToast("Pilih bulan terlebih dahulu");
@@ -1358,8 +1358,6 @@ async function downloadPresensiMonthlyPDF() {
   doc.text(`Nama : ${CONFIG.teacher_name}`,14,69);
   doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`,14,75);
 
-const kelas =
-document.getElementById('filter-rekap-class').value;
 const presensi = allData.attendance.filter(a => {
 const cocokBulan =a.attendance_date.startsWith(bulan);
 const cocokKelas =kelas ? a.attendance_class===kelas : true;
@@ -1402,7 +1400,7 @@ doc.save(`Presensi_${kelas || "Semua_Kelas"}_${periode.replace(" ","_")}.pdf`);
         const p = document.getElementById('login-password').value;
         if(u === 'admin' && p === 'admin123') {
           document.getElementById('login-page').classList.add('hidden');
-          document.getElementById('dashboard-page').classList.remove('hidden');doc.save(`Presensi_${kelas || "Semua_Kelas"}_${periode.replace(" ","_")}.pdf`);
+          document.getElementById('dashboard-page').classList.remove('hidden');
         } else {
           document.getElementById('login-error').classList.remove('hidden');
           setTimeout(() => document.getElementById('login-error').classList.add('hidden'), 3000);
