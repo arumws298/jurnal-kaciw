@@ -1288,7 +1288,11 @@ const jurnal = allData.journals.filter(j => {
     const cocokKelas = kelas ? j.journal_class === kelas : true;
     return cocokBulan && cocokKelas;
 });
-
+// Cek apakah ada data
+if (jurnal.length === 0) {
+    showToast("Tidak ada jurnal pada periode tersebut");
+    return;
+}
   const data = jurnal.map(j => [
       formatDate(j.journal_date),
       j.journal_time,
@@ -1314,7 +1318,7 @@ const jurnal = allData.journals.filter(j => {
       addSignatures(doc,20);
   }
 
-  doc.save(`Jurnal_${kelas || "Semua_Kelas"}_${periode.replace(" ","_")}.pdf`);
+doc.save(`Jurnal_${(kelas || "Semua_Kelas").replace(/\s+/g,"_")}_${periode.replace(/\s+/g,"_")}.pdf`);
 }
 async function downloadPresensiMonthlyPDF() {
 
@@ -1363,6 +1367,15 @@ const cocokBulan =a.attendance_date.startsWith(bulan);
 const cocokKelas =kelas ? a.attendance_class===kelas : true;
 return cocokBulan && cocokKelas;
 });
+  if (presensi.length === 0) {
+    showToast("Tidak ada data presensi pada periode tersebut");
+    return;
+}
+
+// Urutkan berdasarkan tanggal
+presensi.sort((a, b) =>
+    new Date(a.attendance_date) - new Date(b.attendance_date)
+);
 
   const data = presensi.map(a=>[
       formatDate(a.attendance_date),
@@ -1388,7 +1401,7 @@ return cocokBulan && cocokKelas;
       addSignatures(doc,20);
   }
 
-doc.save(`Presensi_${kelas || "Semua_Kelas"}_${periode.replace(" ","_")}.pdf`);
+doc.save(`Presensi_${(kelas || "Semua_Kelas").replace(/\s+/g,"_")}_${periode.replace(/\s+/g,"_")}.pdf`);
 }
     
     // --- EVENT LISTENERS SETUP ---
