@@ -1335,7 +1335,7 @@ const data = allData.journals.map(j => [
   doc.setFontSize(16);
   doc.setFont(undefined,'bold');
   doc.text("JURNAL MENGAJAR GURU",105,54,{align:'center'});
-  doc.text(`Periode : ${periode}`,105,61,{align:'center'});
+  doc.text(`Periode : ${periode}`,105,51,{align:'center'});
 
   doc.setFontSize(11);
   doc.setFont(undefined,'normal');
@@ -1446,7 +1446,7 @@ async function downloadPresensiMonthlyPDF() {
 
   doc.setFontSize(11);
   doc.setFont(undefined,'normal');
-  doc.text(`Periode : ${periode}`,105,67,{align:'center'});
+  doc.text(`Periode : ${periode}`,105,61,{align:'center'});
 //-FORMAT PENULISAN 
 doc.text("Kelas",14,69);
 doc.text(":",50,69);
