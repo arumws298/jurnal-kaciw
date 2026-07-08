@@ -538,11 +538,27 @@ function initApp() {
       setTimeout(() => toast.classList.add('hidden'), 3000);
     }
 
-    function formatDate(dateStr) {
-      const options = { day: 'numeric', month: 'long', year: 'numeric' };
-      return new Date(dateStr).toLocaleDateString('id-ID', options);
-    }
+   function formatDate(dateStr) {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const hari = String(date.getDate()).padStart(2, '0');
+    const bulan = String(date.getMonth() + 1).padStart(2, '0');
+    const tahun = date.getFullYear();
+     
+    return `${hari}/${bulan}/${tahun}`;
+}
 
+    function formatDateLong(dateStr) {
+    if (!dateStr) return "";
+
+    const options = {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    };
+    return new Date(dateStr).toLocaleDateString('id-ID', options);
+}
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -1189,7 +1205,7 @@ doc.addImage(img,'PNG',10,5,190,35);
 
       // Data
       const data = allData.attendance.map(a => [
-        formatDate(a.attendance_date), a.student_name, a.attendance_class, a.attendance_status
+        formatDateLong(a.attendance_date), a.student_name, a.attendance_class, a.attendance_status
       ]);
 
       doc.autoTable({
@@ -1226,7 +1242,7 @@ doc.setFont(undefined, 'normal');
 doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
 
       const data = allData.journals.map(j => [
-        formatDate(j.journal_date), j.journal_time, j.journal_class, j.journal_topic, j.journal_activity
+        formatDateLong(j.journal_date), j.journal_time, j.journal_class, j.journal_topic, j.journal_activity
       ]);
 
       doc.autoTable({
@@ -1294,7 +1310,7 @@ if (jurnal.length === 0) {
     return;
 }
   const data = jurnal.map(j => [
-      formatDate(j.journal_date),
+      formatDateLong(j.journal_date),
       j.journal_time,
       j.journal_class,
       j.journal_topic,
@@ -1378,7 +1394,7 @@ presensi.sort((a, b) =>
 );
 
   const data = presensi.map(a=>[
-      formatDate(a.attendance_date),
+      formatDateLong(a.attendance_date),
       a.student_name,
       a.attendance_class,
       a.attendance_status
