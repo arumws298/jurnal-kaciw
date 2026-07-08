@@ -427,16 +427,18 @@ const supabaseClient = supabase.createClient(
 const KOP_URL =
 'https://raw.githubusercontent.com/arumws298/jurnal-kaciw/main/kop-sekolah.png';
     let KOP_IMAGE = null;
-    async function loadKopImage() {
+   async function loadKopImage() {
     const response = await fetch(KOP_URL);
+    if (!response.ok) {
+        console.error("Gagal mengambil kop surat");
+        return;
+    }
     const blob = await response.blob();
-      
     KOP_IMAGE = await new Promise(resolve => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
         reader.readAsDataURL(blob);
     });
-
 }
     const CONFIG = {
       school_name: 'SMKN 9 Kabupaten Tangerang',
@@ -1204,7 +1206,7 @@ if(fMonth)
       doc.setFont(undefined, 'normal');
       doc.text(`NIP. ${CONFIG.teacher_nip}`, 130, y+35);
     }
-
+//-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
@@ -1218,6 +1220,7 @@ if(fMonth)
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
 
+const kelas = document.getElementById("filter-rekap-class").value;
 doc.text("Kelas",14,69);
 doc.text(":",50,69);
 doc.text(kelas || "Semua Kelas",54,69);
@@ -1236,7 +1239,7 @@ doc.text(CONFIG.subject_name,54,81);
       ]);
 
       doc.autoTable({
-        startY: 60, head: [['Tanggal', 'Nama', 'Kelas', 'Status']],
+        startY: 90, head: [['Tanggal', 'Nama', 'Kelas', 'Status']],
         body: data, theme: 'grid', headStyles: {fillColor: [30, 64, 175]}
       });
 
@@ -1288,7 +1291,7 @@ const data = allData.journals.map(j => [
 ]);
 
       doc.autoTable({
-        startY: 60, head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
+        startY: 90, head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
         body: data, theme: 'grid', headStyles: {fillColor: [30, 64, 175]}
       });
 
