@@ -311,9 +311,30 @@
           </div>
 
           <div class="mb-6 flex flex-col md:flex-row gap-4">
-             <button id="btn-add-journal" class="btn-primary text-white font-semibold py-3 px-6 rounded-xl shadow-md"> + Tambah Jurnal Baru </button>
-             <div class="flex-1 max-w-xs"><label for="filter-jurnal-month" class="block text-sm font-semibold text-gray-700 mb-2">Filter Bulan</label> <input type="month" id="filter-jurnal-month" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl"></div>
-          </div>
+            <button id="btn-add-journal"class="btn-primary text-white font-semibold py-3 px-6 rounded-xl shadow-md">+ Tambah Jurnal Baru
+    </button>
+            <div class="flex-1 max-w-xs">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Filter Kelas
+        </label>
+
+        <select id="filter-jurnal-class"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white">
+            <option value="">Semua Kelas</option>
+        </select>
+    </div>
+
+    <div class="flex-1 max-w-xs">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Filter Bulan
+        </label>
+
+        <input
+            type="month"
+            id="filter-jurnal-month"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl">
+    </div>
+
+</div>
 
           <div class="overflow-x-auto rounded-xl border border-gray-200">
             <table class="w-full">
@@ -530,21 +551,36 @@ function initApp() {
       return classes;
     }
 
-    function updateClassDropdowns() {
-      const classes = getClasses();
-      const options = '<option value="">Pilih Kelas</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
-      
-      ['select-attendance-class', 'filter-rekap-class', 'input-journal-class'].forEach(id => {
-        const el = document.getElementById(id);
-        if(el) {
-          const currentVal = el.value;
-          el.innerHTML = options;
-          if (classes.includes(currentVal)) el.value = currentVal;
-        }
-      });
+   function updateClassDropdowns() {
+  const classes = getClasses();
 
-      document.getElementById('filter-student-class').innerHTML = '<option value="">Semua Kelas</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
+  const options =
+    '<option value="">Pilih Kelas</option>' +
+    classes.map(c => `<option value="${c}">${c}</option>`).join('');
+
+  [
+    'select-attendance-class',
+    'filter-rekap-class',
+    'input-journal-class',
+    'filter-jurnal-class'   // <-- TAMBAHKAN INI
+  ].forEach(id => {
+
+    const el = document.getElementById(id);
+
+    if (el) {
+      const currentVal = el.value;
+      el.innerHTML = options;
+
+      if (classes.includes(currentVal))
+        el.value = currentVal;
     }
+
+  });
+
+  document.getElementById('filter-student-class').innerHTML =
+    '<option value="">Semua Kelas</option>' +
+    classes.map(c => `<option value="${c}">${c}</option>`).join('');
+}
 
     // --- NAVIGASI ---
     function showPage(pageId) {
@@ -1045,8 +1081,14 @@ async function deleteAttendance(id) {
     // --- LOGIKA JURNAL ---
     function renderRekapJurnal() {
       const fMonth = document.getElementById('filter-jurnal-month').value;
+      const fClass =document.getElementById('filter-jurnal-class').value;
       let data = allData.journals;
-      if(fMonth) data = data.filter(j => j.journal_date.startsWith(fMonth));
+      if(fClass)
+        data = data.filter(j =>j.journal_class === fClass);
+
+if(fMonth)
+    data = data.filter(j =>
+        j.journal_date.startsWith(fMonth));
 
       const tbody = document.getElementById('rekap-jurnal-body');
       if(data.length === 0) {
@@ -1236,11 +1278,17 @@ doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
   doc.setFontSize(11);
   doc.setFont(undefined,'normal');
   doc.text(`Periode : ${periode}`,105,55,{align:'center'});
-  doc.text(`Nama : ${CONFIG.teacher_name}`,14,63);
+  doc.text(`Kelas : ${kelas || "Semua Kelas"}`,14,63);
+  doc.text(`Nama : ${CONFIG.teacher_name}`,14,69);
+  doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`,14,75);
 
-  const jurnal = allData.journals.filter(j =>
-      j.journal_date.startsWith(bulan)
-  );
+  const kelas =document.getElementById('filter-jurnal-class').value;
+
+const jurnal = allData.journals.filter(j => {
+    const cocokBulan = j.journal_date.startsWith(bulan);
+    const cocokKelas = kelas ? j.journal_class === kelas : true;
+    return cocokBulan && cocokKelas;
+});
 
   const data = jurnal.map(j => [
       formatDate(j.journal_date),
@@ -1251,7 +1299,7 @@ doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
   ]);
 
   doc.autoTable({
-      startY:68,
+      startY:80,
       head:[['Tanggal','Jam','Kelas','Topik','Aktivitas']],
       body:data,
       theme:'grid',
@@ -1267,7 +1315,7 @@ doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
       addSignatures(doc,20);
   }
 
-  doc.save(`Jurnal_Mengajar_${periode}.pdf`);
+  doc.save(`Jurnal_${kelas || "Semua_Kelas"}_${periode.replace(" ","_")}.pdf`);
 }
 async function downloadPresensiMonthlyPDF() {
 
@@ -1306,11 +1354,17 @@ async function downloadPresensiMonthlyPDF() {
   doc.setFontSize(11);
   doc.setFont(undefined,'normal');
   doc.text(`Periode : ${periode}`,105,55,{align:'center'});
-  doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`,14,63);
+  doc.text(`Kelas : ${kelas || "Semua Kelas"}`,14,63);
+  doc.text(`Nama : ${CONFIG.teacher_name}`,14,69);
+  doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`,14,75);
 
-  const presensi = allData.attendance.filter(a =>
-      a.attendance_date.startsWith(bulan)
-  );
+const kelas =
+document.getElementById('filter-rekap-class').value;
+const presensi = allData.attendance.filter(a => {
+const cocokBulan =a.attendance_date.startsWith(bulan);
+const cocokKelas =kelas ? a.attendance_class===kelas : true;
+return cocokBulan && cocokKelas;
+});
 
   const data = presensi.map(a=>[
       formatDate(a.attendance_date),
@@ -1320,7 +1374,7 @@ async function downloadPresensiMonthlyPDF() {
   ]);
 
   doc.autoTable({
-      startY:68,
+      startY:80,
       head:[['Tanggal','Nama','Kelas','Status']],
       body:data,
       theme:'grid',
@@ -1336,7 +1390,7 @@ async function downloadPresensiMonthlyPDF() {
       addSignatures(doc,20);
   }
 
-  doc.save(`Presensi_${periode}.pdf`);
+doc.save(`Presensi_${kelas || "Semua_Kelas"}_${periode.replace(" ","_")}.pdf`);
 }
     
     // --- EVENT LISTENERS SETUP ---
@@ -1348,7 +1402,7 @@ async function downloadPresensiMonthlyPDF() {
         const p = document.getElementById('login-password').value;
         if(u === 'admin' && p === 'admin123') {
           document.getElementById('login-page').classList.add('hidden');
-          document.getElementById('dashboard-page').classList.remove('hidden');
+          document.getElementById('dashboard-page').classList.remove('hidden');doc.save(`Presensi_${kelas || "Semua_Kelas"}_${periode.replace(" ","_")}.pdf`);
         } else {
           document.getElementById('login-error').classList.remove('hidden');
           setTimeout(() => document.getElementById('login-error').classList.add('hidden'), 3000);
@@ -1387,6 +1441,7 @@ async function downloadPresensiMonthlyPDF() {
       document.getElementById('btn-download-jurnal-monthly-pdf').addEventListener('click', downloadJurnalMonthlyPDF);
       document.getElementById('form-add-journal').addEventListener('submit', addJournal);
       document.getElementById('filter-jurnal-month').addEventListener('change', renderRekapJurnal);
+      document.getElementById('filter-jurnal-class').addEventListener('change', renderRekapJurnal);
       document.getElementById('btn-download-jurnal-pdf').addEventListener('click', downloadJurnalPDF);
     }
 
