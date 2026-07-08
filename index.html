@@ -426,7 +426,18 @@ const supabaseClient = supabase.createClient(
 );
 const KOP_URL =
 'https://raw.githubusercontent.com/arumws298/jurnal-kaciw/main/kop-sekolah.png';
-    
+    let KOP_IMAGE = null;
+    async function loadKopImage() {
+    const response = await fetch(KOP_URL);
+    const blob = await response.blob();
+      
+    KOP_IMAGE = await new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+    });
+
+}
     const CONFIG = {
       school_name: 'SMKN 9 Kabupaten Tangerang',
       teacher_name: 'Arum Widya Safitri, S.Pd',
@@ -475,7 +486,9 @@ async function loadJournalsFromSupabase() {
   }
 }
     // --- INISIALISASI ---
-function initApp() {
+async function initApp() {
+
+  await loadKopImage();
 
   document.getElementById('login-school-name').textContent = CONFIG.school_name;
   document.getElementById('header-school-name').textContent = CONFIG.school_name;
@@ -1195,15 +1208,7 @@ if(fMonth)
     async function downloadPresensiPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      const img = await fetch(KOP_URL)
-  .then(res => res.blob())
-  .then(blob => new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.readAsDataURL(blob);
-  }));
-
-doc.addImage(img, 'PNG', 10, 5, 190, 42);
+     doc.addImage(KOP_IMAGE,'PNG',10,5,190,42);
 
     // JUDUL
     doc.setFontSize(14);
@@ -1245,14 +1250,7 @@ doc.text(CONFIG.subject_name,54,81);
 async function downloadJurnalPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-     const img = await fetch(KOP_URL).then(res => res.blob()).then(blob => new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.readAsDataURL(blob);
-  }));
-
-doc.addImage(img,'PNG',10,5,190,42);
-
+    doc.addImage(KOP_IMAGE,'PNG',10,5,190,42);
 // Judul di bawah kop
 doc.setFontSize(16);
 doc.setFont(undefined, 'bold');
@@ -1314,15 +1312,7 @@ const data = allData.journals.map(j => [
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  const img = await fetch(KOP_URL)
-    .then(res => res.blob())
-    .then(blob => new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(blob);
-    }));
-
-  doc.addImage(img,'PNG',10,5,190,42);
+  doc.addImage(KOP_IMAGE, 'PNG', 10, 5, 190, 42);
 
   const namaBulan = [
     "Januari","Februari","Maret","April","Mei","Juni",
@@ -1421,17 +1411,8 @@ async function downloadPresensiMonthlyPDF() {
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-
-  const img = await fetch(KOP_URL)
-    .then(res=>res.blob())
-    .then(blob=>new Promise(resolve=>{
-      const reader=new FileReader();
-      reader.onloadend=()=>resolve(reader.result);
-      reader.readAsDataURL(blob);
-    }));
-
-  doc.addImage(img,'PNG',10,5,190,42);
-
+  doc.addImage(KOP_IMAGE, 'PNG', 10, 5, 190, 42);
+  
   const namaBulan=[
     "Januari","Februari","Maret","April","Mei","Juni",
     "Juli","Agustus","September","Oktober","November","Desember"
