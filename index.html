@@ -559,6 +559,17 @@ function initApp() {
     };
     return new Date(dateStr).toLocaleDateString('id-ID', options);
 }
+    function formatDateSignature(dateStr) {
+    if (!dateStr) return "";
+
+    const options = {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    };
+
+    return new Date(dateStr).toLocaleDateString('id-ID', options);
+}
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -1172,7 +1183,7 @@ if(fMonth)
       doc.setFont(undefined, 'normal');
       doc.text(`NIP. ${CONFIG.principal_nip}`, 20, y+35);
 
-      doc.text("Tangerang, " + formatDate(new Date()), 130, y);
+      doc.text("Tangerang, " + formatDateSignature(new Date()), 130, y);
       doc.text("Guru Mata Pelajaran", 130, y+5);
       doc.text("", 130, y+25);
       doc.setFont(undefined, 'bold');
@@ -1219,8 +1230,8 @@ doc.addImage(img,'PNG',10,5,190,35);
 
       doc.save('Laporan_Presensi_FULL.pdf');
     }
-
-    async function downloadJurnalPDF() {
+// --- DOWNLOAD PDF FULL JURNAL ---
+async function downloadJurnalPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
      const img = await fetch(KOP_URL).then(res => res.blob()).then(blob => new Promise(resolve => {
@@ -1240,10 +1251,26 @@ doc.text("JURNAL MENGAJAR GURU", 105, 48, { align: 'center' });
 doc.setFontSize(12);
 doc.setFont(undefined, 'normal');
 doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
+// Urutkan jurnal berdasarkan tanggal lalu jam
+allData.journals.sort((a, b) => {
 
-      const data = allData.journals.map(j => [
-        formatDateLong(j.journal_date), j.journal_time, j.journal_class, j.journal_topic, j.journal_activity
-      ]);
+    const selisihTanggal = new Date(a.journal_date) - new Date(b.journal_date);
+    if (selisihTanggal !== 0) return selisihTanggal;
+
+    const jamA = parseInt(a.journal_time.replace("Jam", "").trim().split("-")[0]);
+    const jamB = parseInt(b.journal_time.replace("Jam", "").trim().split("-")[0]);
+
+    return jamA - jamB;
+
+});
+
+const data = allData.journals.map(j => [
+    formatDateLong(j.journal_date),
+    j.journal_time,
+    j.journal_class,
+    j.journal_topic,
+    j.journal_activity
+]);
 
       doc.autoTable({
         startY: 60, head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
@@ -1257,7 +1284,7 @@ doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
       doc.save('Jurnal_Mengajar_FULL.pdf');
     }
 
-// --- DOWNLOAD PDF BULANAN ---
+// --- DOWNLOAD PDF BULANAN JURNAL ---
   async function downloadJurnalMonthlyPDF() {
   const bulan = document.getElementById('filter-jurnal-month').value;
   const kelas =document.getElementById('filter-jurnal-class').value;
@@ -1304,11 +1331,28 @@ const jurnal = allData.journals.filter(j => {
     const cocokKelas = kelas ? j.journal_class === kelas : true;
     return cocokBulan && cocokKelas;
 });
+// Urutkan berdasarkan tanggal, lalu jam pelajaran
+jurnal.sort((a, b) => {
+
+    const selisihTanggal = new Date(a.journal_date) - new Date(b.journal_date);
+    if (selisihTanggal !== 0) return selisihTanggal;
+
+    const jamA = parseInt(
+        a.journal_time.replace("Jam", "").trim().split("-")[0]
+    );
+
+    const jamB = parseInt(
+        b.journal_time.replace("Jam", "").trim().split("-")[0]
+    );
+
+    return jamA - jamB;
+
+});
 // Cek apakah ada data
 if (jurnal.length === 0) {
     showToast("Tidak ada jurnal pada periode tersebut");
     return;
-}
+)
   const data = jurnal.map(j => [
       formatDateLong(j.journal_date),
       j.journal_time,
@@ -1336,6 +1380,8 @@ if (jurnal.length === 0) {
 
 doc.save(`Jurnal_${(kelas || "Semua_Kelas").replace(/\s+/g,"_")}_${periode.replace(/\s+/g,"_")}.pdf`);
 }
+    
+//----- DOWNLOAD PRESENSI BULANAN-----
 async function downloadPresensiMonthlyPDF() {
 
   const bulan = document.getElementById('filter-rekap-month').value;
