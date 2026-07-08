@@ -340,7 +340,46 @@
 
     <!-- MODALS -->
     <!-- Modal Add Student -->
-    <div id="modal-add-student" class="fixed inset-0 z-50 hidden"><div class="modal-backdrop absolute inset-0" onclick="closeModal('modal-add-student')"></div><div class="absolute inset-0 flex items-center justify-center p-4"><div class="card-glass rounded-2xl w-full max-w-md fade-in p-6"><h3 class="text-xl font-bold text-blue-900 mb-4">Tambah Siswa</h3><form id="form-add-student" class="space-y-4"><div><label class="block text-sm font-semibold text-gray-700 mb-1">Nama Siswa</label><input type="text" id="input-student-name" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Kelas</label><select id="input-student-class" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl bg-white"><option value="">Pilih Kelas</option><option value="X MP 1">X MP 1</option><option value="X MP 2">X MP 2</option><option value="XI FKK 1">XI FKK 1</option><option value="XI FKK 2">XI FKK 2</option><option value="XI TKJ 1">XI TKJ 1</option><option value="XI TKJ 2">XI TKJ 2</option><option value="XII DKV 1">XII DKV 1</option><option value="XII DKV 2">XII DKV 2</option><option value="XII MP 1">XII MP 1</option></select></div><div class="flex gap-3 pt-2"><button type="button" onclick="closeModal('modal-add-student')" class="flex-1 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl">Batal</button><button type="submit" class="flex-1 btn-primary text-white font-semibold py-2 rounded-xl">Simpan</button></div></form></div></div></div>
+    <div id="modal-add-student" class="fixed inset-0 z-50 hidden"><div class="modal-backdrop absolute inset-0" onclick="closeModal('modal-add-student')"></div><div class="absolute inset-0 flex items-center justify-center p-4"><div class="card-glass rounded-2xl w-full max-w-md fade-in p-6"><h3 class="text-xl font-bold text-blue-900 mb-4">Tambah Siswa</h3><form id="form-add-student" class="space-y-4"><div><label class="block text-sm font-semibold text-gray-700 mb-1">Nama Siswa</label><input type="text" id="input-student-name" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Kelas</label><select id="input-student-class" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl bg-white"><option value="">Pilih Kelas
+    </option><option value="X AKC 1">X AKC 1
+    </option><option value="X AKC 2">X AKC 2
+    </option><option value="X DKV 1">X DKV 1
+    </option><option value="X DKV 2">X DKV 2
+    </option><option value="X FKK 1">X FKK 1
+    </option><option value="X FKK 2">X FKK 2
+    </option><option value="X MP 1">X MP 1
+    </option><option value="X MP 2">X MP 2
+    </option><option value="X TKJ 1">X TKJ 1
+    </option><option value="X TKJ 2">X TKJ 2
+    </option><option value="X TSM 1">X TSM 1
+    </option><option value="X TSM 2">X TSM 2
+
+    </option><option value="XI AKC 1">XI AKC 1
+    </option><option value="XI AKC 2">XI AKC 2
+    </option><option value="XI DKV 1">XI DKV 1
+    </option><option value="XI DKV 2">XI DKV 2
+    </option><option value="XI FKK 1">XI FKK 1
+    </option><option value="XI FKK 2">XI FKK 2
+    </option><option value="XI MP 1">XI MP 1
+    </option><option value="XI MP 2">XI MP 2
+    </option><option value="XI TKJ 1">XI TKJ 1
+    </option><option value="XI TKJ 2">XI TKJ 2
+    </option><option value="XI TSM 1">XI TSM 1
+    </option><option value="XI TSM 2">XI TSM 2
+
+    </option><option value="XII AKC 1">XII AKC 1
+    </option><option value="XII AKC 2">XII AKC 2
+    </option><option value="XII DKV 1">XII DKV 1
+    </option><option value="XII DKV 2">XII DKV 2
+    </option><option value="XII FKK 1">XII FKK 1
+    </option><option value="XII FKK 2">XII FKK 2
+    </option><option value="XII MP 1">XII MP 1
+    </option><option value="XII MP 2">XII MP 2
+    </option><option value="XII TKJ 1">XII TKJ 1
+    </option><option value="XII TKJ 2">XII TKJ 2
+    </option><option value="XII TSM 1">XII TSM 1
+    </option><option value="XII TSM 2">XII TSM 2
+    </option></select></div><div class="flex gap-3 pt-2"><button type="button" onclick="closeModal('modal-add-student')" class="flex-1 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl">Batal</button><button type="submit" class="flex-1 btn-primary text-white font-semibold py-2 rounded-xl">Simpan</button></div></form></div></div></div>
 
     <!-- Modal Add Journal -->
     <div id="modal-add-journal" class="fixed inset-0 z-50 hidden"><div class="modal-backdrop absolute inset-0" onclick="closeModal('modal-add-journal')"></div><div class="absolute inset-0 flex items-center justify-center p-4"><div class="card-glass rounded-2xl w-full max-w-md fade-in p-6"><h3 class="text-xl font-bold text-blue-900 mb-4">Tambah Jurnal</h3><form id="form-add-journal" class="space-y-4"><div><label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal</label><input type="date" id="input-journal-date" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Jam Ke-</label><input type="text" id="input-journal-time" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl" placeholder="Contoh: 1-4"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Kelas</label><select id="input-journal-class" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl bg-white"><option value="">Pilih Kelas</option></select></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Topik</label><input type="text" id="input-journal-topic" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Aktivitas</label><textarea id="input-journal-activity" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl resize-none"></textarea></div><div class="flex gap-3 pt-2"><button type="button" onclick="closeModal('modal-add-journal')" class="flex-1 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl">Batal</button><button type="submit" class="flex-1 btn-primary text-white font-semibold py-2 rounded-xl">Simpan</button></div></form></div></div></div>
@@ -364,7 +403,7 @@ const supabaseClient = supabase.createClient(
   supabaseUrl,
   supabaseKey
 );
-    const KOP_URL =
+const KOP_URL =
 'https://raw.githubusercontent.com/arumws298/jurnal-kaciw/main/kop-sekolah.png';
     
     const CONFIG = {
