@@ -1203,16 +1203,27 @@ if(fMonth)
     reader.readAsDataURL(blob);
   }));
 
-doc.addImage(img,'PNG',10,5,190,35);
+doc.addImage(img, 'PNG', 10, 5, 190, 42);
 
     // JUDUL
     doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
-    doc.text("LAPORAN PRESENSI SISWA", 105, 50, { align: 'center' });
+    doc.text("LAPORAN PRESENSI SISWA", 105, 54, { align: 'center' });
     
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
-    doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`, 14, 55);
+
+doc.text("Kelas",14,69);
+doc.text(":",50,69);
+doc.text(kelas || "Semua Kelas",54,69);
+
+doc.text("Nama",14,75);
+doc.text(":",50,75);
+doc.text(CONFIG.teacher_name,54,75);
+
+doc.text("Mata Pelajaran",14,81);
+doc.text(":",50,81);
+doc.text(CONFIG.subject_name,54,81);
 
       // Data
       const data = allData.attendance.map(a => [
@@ -1240,17 +1251,23 @@ async function downloadJurnalPDF() {
     reader.readAsDataURL(blob);
   }));
 
-doc.addImage(img,'PNG',10,5,190,35);
+doc.addImage(img,'PNG',10,5,190,42);
 
 // Judul di bawah kop
 doc.setFontSize(16);
 doc.setFont(undefined, 'bold');
-doc.text("JURNAL MENGAJAR GURU", 105, 48, { align: 'center' });
+doc.text("JURNAL MENGAJAR GURU", 105, 54, { align: 'center' });
 
 // Nama guru di bawah judul
 doc.setFontSize(12);
 doc.setFont(undefined, 'normal');
-doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
+doc.text("Nama",14,69);
+doc.text(":",50,69);
+doc.text(CONFIG.teacher_name,54,69);
+
+doc.text("Mata Pelajaran",14,75);
+doc.text(":",50,75);
+doc.text(CONFIG.subject_name,54,75);
 // Urutkan jurnal berdasarkan tanggal lalu jam
 allData.journals.sort((a, b) => {
 
@@ -1305,7 +1322,7 @@ const data = allData.journals.map(j => [
       reader.readAsDataURL(blob);
     }));
 
-  doc.addImage(img,'PNG',10,5,190,35);
+  doc.addImage(img,'PNG',10,5,190,42);
 
   const namaBulan = [
     "Januari","Februari","Maret","April","Mei","Juni",
@@ -1317,15 +1334,24 @@ const data = allData.journals.map(j => [
 
   doc.setFontSize(16);
   doc.setFont(undefined,'bold');
-  doc.text("JURNAL MENGAJAR GURU",105,48,{align:'center'});
+  doc.text("JURNAL MENGAJAR GURU",105,54,{align:'center'});
+  doc.text(`Periode : ${periode}`,105,61,{align:'center'});
 
   doc.setFontSize(11);
   doc.setFont(undefined,'normal');
-  doc.text(`Periode : ${periode}`,105,55,{align:'center'});
-  doc.text(`Kelas : ${kelas || "Semua Kelas"}`,14,63);
-  doc.text(`Nama : ${CONFIG.teacher_name}`,14,69);
-  doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`,14,75);
+//FORMAT PENULISAN
+doc.text("Kelas",14,69);
+doc.text(":",50,69);
+doc.text(kelas || "Semua Kelas",54,69);
 
+doc.text("Nama",14,75);
+doc.text(":",50,75);
+doc.text(CONFIG.teacher_name,54,75);
+
+doc.text("Mata Pelajaran",14,81);
+doc.text(":",50,81);
+doc.text(CONFIG.subject_name,54,81);
+    
 const jurnal = allData.journals.filter(j => {
     const cocokBulan = j.journal_date.startsWith(bulan);
     const cocokKelas = kelas ? j.journal_class === kelas : true;
@@ -1363,7 +1389,7 @@ const data = jurnal.map(j => [
 ]);
 
   doc.autoTable({
-      startY:80,
+      startY:90,
       head:[['Tanggal','Jam','Kelas','Topik','Aktivitas']],
       body:data,
       theme:'grid',
@@ -1404,7 +1430,7 @@ async function downloadPresensiMonthlyPDF() {
       reader.readAsDataURL(blob);
     }));
 
-  doc.addImage(img,'PNG',10,5,190,35);
+  doc.addImage(img,'PNG',10,5,190,42);
 
   const namaBulan=[
     "Januari","Februari","Maret","April","Mei","Juni",
@@ -1416,14 +1442,23 @@ async function downloadPresensiMonthlyPDF() {
 
   doc.setFontSize(16);
   doc.setFont(undefined,'bold');
-  doc.text("LAPORAN PRESENSI SISWA",105,48,{align:'center'});
+  doc.text("LAPORAN PRESENSI SISWA",105,54,{align:'center'});
 
   doc.setFontSize(11);
   doc.setFont(undefined,'normal');
-  doc.text(`Periode : ${periode}`,105,55,{align:'center'});
-  doc.text(`Kelas : ${kelas || "Semua Kelas"}`,14,63);
-  doc.text(`Nama : ${CONFIG.teacher_name}`,14,69);
-  doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`,14,75);
+  doc.text(`Periode : ${periode}`,105,67,{align:'center'});
+//-FORMAT PENULISAN 
+doc.text("Kelas",14,69);
+doc.text(":",50,69);
+doc.text(kelas || "Semua Kelas",54,69);
+
+doc.text("Nama",14,75);
+doc.text(":",50,75);
+doc.text(CONFIG.teacher_name,54,75);
+
+doc.text("Mata Pelajaran",14,81);
+doc.text(":",50,81);
+doc.text(CONFIG.subject_name,54,81);
 
 const presensi = allData.attendance.filter(a => {
 const cocokBulan =a.attendance_date.startsWith(bulan);
@@ -1448,7 +1483,7 @@ presensi.sort((a, b) =>
   ]);
 
   doc.autoTable({
-      startY:80,
+      startY:90,
       head:[['Tanggal','Nama','Kelas','Status']],
       body:data,
       theme:'grid',
