@@ -1352,14 +1352,15 @@ jurnal.sort((a, b) => {
 if (jurnal.length === 0) {
     showToast("Tidak ada jurnal pada periode tersebut");
     return;
-)
-  const data = jurnal.map(j => [
-      formatDateLong(j.journal_date),
-      j.journal_time,
-      j.journal_class,
-      j.journal_topic,
-      j.journal_activity
-  ]);
+}
+
+const data = jurnal.map(j => [
+    formatDateLong(j.journal_date),
+    j.journal_time,
+    j.journal_class,
+    j.journal_topic,
+    j.journal_activity
+]);
 
   doc.autoTable({
       startY:80,
