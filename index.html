@@ -1135,28 +1135,6 @@ async function deleteAttendance(id) {
   }));
 
 doc.addImage(img,'PNG',10,5,190,35);
-      
-     // KOP SURAT
-    doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
-    doc.text("PEMERINTAH PROVINSI BANTEN", 105, 10, { align: 'center' });
-
-    doc.text("DINAS PENDIDIKAN DAN KEBUDAYAAN", 105, 16, { align: 'center' });
-
-    doc.setFontSize(14);
-    doc.text("SMK NEGERI 9 KABUPATEN TANGERANG", 105, 23, { align: 'center' });
-
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-
-    doc.text(
-      "Perum Argo Subur, Ds.Pasanggrahan Kec. Solear Kab. Tangerang",
-      105,
-      29,
-      { align: 'center' }
-    );
-    
-    doc.line(10, 35, 200, 35);
 
     // JUDUL
     doc.setFontSize(14);
