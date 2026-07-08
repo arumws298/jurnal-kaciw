@@ -1114,7 +1114,7 @@ async function deleteAttendance(id) {
       doc.setFont(undefined, 'normal');
       doc.text(`NIP. ${CONFIG.principal_nip}`, 20, y+35);
 
-      doc.text("Kabupaten Tangerang, " + formatDate(new Date()), 130, y);
+      doc.text("Tangerang, " + formatDate(new Date()), 130, y);
       doc.text("Guru Mata Pelajaran", 130, y+5);
       doc.text("", 130, y+25);
       doc.setFont(undefined, 'bold');
@@ -1159,7 +1159,7 @@ doc.addImage(img,'PNG',10,5,190,35);
       if(finalY < 200) addSignatures(doc, finalY);
       else { doc.addPage(); addSignatures(doc, 20); }
 
-      doc.save('Laporan_Presensi_KACIW.pdf');
+      doc.save('Laporan_Presensi_FULL.pdf');
     }
 
     async function downloadJurnalPDF() {
@@ -1171,12 +1171,17 @@ doc.addImage(img,'PNG',10,5,190,35);
     reader.readAsDataURL(blob);
   }));
 
-      doc.addImage(img,'PNG',10,5,190,35);
-      doc.setFontSize(16); doc.setFont(undefined, 'bold');
-      doc.text("JURNAL MENGAJAR GURU", 105, 15, {align:'center'});
-      doc.setFontSize(12); doc.setFont(undefined, 'normal');
-      doc.text(CONFIG.school_name, 105, 22, {align:'center'});
-      doc.text(`Nama: ${CONFIG.teacher_name}`, 105, 28, {align:'center'});
+doc.addImage(img,'PNG',10,5,190,35);
+
+// Judul di bawah kop
+doc.setFontSize(16);
+doc.setFont(undefined, 'bold');
+doc.text("JURNAL MENGAJAR GURU", 105, 48, { align: 'center' });
+
+// Nama guru di bawah judul
+doc.setFontSize(12);
+doc.setFont(undefined, 'normal');
+doc.text(`Nama: ${CONFIG.teacher_name}`, 14, 56);
 
       const data = allData.journals.map(j => [
         formatDate(j.journal_date), j.journal_time, j.journal_class, j.journal_topic, j.journal_activity
@@ -1191,9 +1196,149 @@ doc.addImage(img,'PNG',10,5,190,35);
       if(finalY < 200) addSignatures(doc, finalY);
       else { doc.addPage(); addSignatures(doc, 20); }
 
-      doc.save('Jurnal_Mengajar_KACIW.pdf');
+      doc.save('Jurnal_Mengajar_FULL.pdf');
     }
 
+// --- DOWNLOAD PDF BULANAN ---
+  async function downloadJurnalMonthlyPDF() {
+  const bulan = document.getElementById('filter-jurnal-month').value;
+
+  if (!bulan) {
+    showToast("Pilih bulan terlebih dahulu");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const img = await fetch(KOP_URL)
+    .then(res => res.blob())
+    .then(blob => new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    }));
+
+  doc.addImage(img,'PNG',10,5,190,35);
+
+  const namaBulan = [
+    "Januari","Februari","Maret","April","Mei","Juni",
+    "Juli","Agustus","September","Oktober","November","Desember"
+  ];
+
+  const [tahun, bln] = bulan.split("-");
+  const periode = `${namaBulan[parseInt(bln)-1]} ${tahun}`;
+
+  doc.setFontSize(16);
+  doc.setFont(undefined,'bold');
+  doc.text("JURNAL MENGAJAR GURU",105,48,{align:'center'});
+
+  doc.setFontSize(11);
+  doc.setFont(undefined,'normal');
+  doc.text(`Periode : ${periode}`,105,55,{align:'center'});
+  doc.text(`Nama : ${CONFIG.teacher_name}`,14,63);
+
+  const jurnal = allData.journals.filter(j =>
+      j.journal_date.startsWith(bulan)
+  );
+
+  const data = jurnal.map(j => [
+      formatDate(j.journal_date),
+      j.journal_time,
+      j.journal_class,
+      j.journal_topic,
+      j.journal_activity
+  ]);
+
+  doc.autoTable({
+      startY:68,
+      head:[['Tanggal','Jam','Kelas','Topik','Aktivitas']],
+      body:data,
+      theme:'grid',
+      headStyles:{fillColor:[30,64,175]}
+  });
+
+  const finalY = doc.lastAutoTable.finalY + 20;
+
+  if(finalY < 250)
+      addSignatures(doc, finalY);
+  else{
+      doc.addPage();
+      addSignatures(doc,20);
+  }
+
+  doc.save(`Jurnal_Mengajar_${periode}.pdf`);
+}
+async function downloadPresensiMonthlyPDF() {
+
+  const bulan = document.getElementById('filter-rekap-month').value;
+
+  if (!bulan) {
+    showToast("Pilih bulan terlebih dahulu");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const img = await fetch(KOP_URL)
+    .then(res=>res.blob())
+    .then(blob=>new Promise(resolve=>{
+      const reader=new FileReader();
+      reader.onloadend=()=>resolve(reader.result);
+      reader.readAsDataURL(blob);
+    }));
+
+  doc.addImage(img,'PNG',10,5,190,35);
+
+  const namaBulan=[
+    "Januari","Februari","Maret","April","Mei","Juni",
+    "Juli","Agustus","September","Oktober","November","Desember"
+  ];
+
+  const [tahun,bln]=bulan.split("-");
+  const periode=`${namaBulan[parseInt(bln)-1]} ${tahun}`;
+
+  doc.setFontSize(16);
+  doc.setFont(undefined,'bold');
+  doc.text("LAPORAN PRESENSI SISWA",105,48,{align:'center'});
+
+  doc.setFontSize(11);
+  doc.setFont(undefined,'normal');
+  doc.text(`Periode : ${periode}`,105,55,{align:'center'});
+  doc.text(`Mata Pelajaran : ${CONFIG.subject_name}`,14,63);
+
+  const presensi = allData.attendance.filter(a =>
+      a.attendance_date.startsWith(bulan)
+  );
+
+  const data = presensi.map(a=>[
+      formatDate(a.attendance_date),
+      a.student_name,
+      a.attendance_class,
+      a.attendance_status
+  ]);
+
+  doc.autoTable({
+      startY:68,
+      head:[['Tanggal','Nama','Kelas','Status']],
+      body:data,
+      theme:'grid',
+      headStyles:{fillColor:[30,64,175]}
+  });
+
+  const finalY = doc.lastAutoTable.finalY + 20;
+
+  if(finalY < 250)
+      addSignatures(doc, finalY);
+  else{
+      doc.addPage();
+      addSignatures(doc,20);
+  }
+
+  doc.save(`Presensi_${periode}.pdf`);
+}
+    
     // --- EVENT LISTENERS SETUP ---
     function setupEventListeners() {
       // Login
@@ -1235,9 +1380,11 @@ doc.addImage(img,'PNG',10,5,190,35);
       document.getElementById('filter-rekap-date').addEventListener('change', renderRekapPresensi);
       document.getElementById('filter-rekap-month').addEventListener('change', renderRekapPresensi);
       document.getElementById('btn-download-presensi-pdf').addEventListener('click', downloadPresensiPDF);
+      document.getElementById('btn-download-presensi-monthly-pdf').addEventListener('click', downloadPresensiMonthlyPDF);
       
       // Journal
       document.getElementById('btn-add-journal').addEventListener('click', () => openModal('modal-add-journal'));
+      document.getElementById('btn-download-jurnal-monthly-pdf').addEventListener('click', downloadJurnalMonthlyPDF);
       document.getElementById('form-add-journal').addEventListener('submit', addJournal);
       document.getElementById('filter-jurnal-month').addEventListener('change', renderRekapJurnal);
       document.getElementById('btn-download-jurnal-pdf').addEventListener('click', downloadJurnalPDF);
