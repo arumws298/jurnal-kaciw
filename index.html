@@ -285,7 +285,6 @@
                   <th class="px-4 py-3 text-left text-sm font-bold">Nama Siswa</th>
                   <th class="px-4 py-3 text-left text-sm font-bold">Kelas</th>
                   <th class="px-4 py-3 text-center text-sm font-bold">Status</th>
-                  <th class="px-4 py-3 text-center text-sm font-bold">Aksi</th>
                 </tr>
               </thead>
               <tbody id="rekap-presensi-body"></tbody>
@@ -638,12 +637,8 @@ async function initApp() {
 
       // Trigger render functions
       if (pageId === 'manajemen-siswa') renderStudents();
-     if (pageId === 'input-presensi') {
-    if (attendanceMode === "add") { document.getElementById("input-attendance-date").valueAsDate = new Date(); 
-      } else {
-      document.getElementById("select-attendance-class").value = editAttendanceClass;
-      document.getElementById("input-attendance-date").value = editAttendanceDate;
-    }
+      if (pageId === 'input-presensi') {
+        document.getElementById('input-attendance-date').valueAsDate = new Date();
     renderAttendanceList();
 }
       if (pageId === 'rekap-presensi') renderRekapPresensi();
@@ -930,11 +925,6 @@ reader.readAsArrayBuffer(file);
 
   openModal('modal-confirm');
 }
-
-// MODE PRESENSI
-let attendanceMode = "add"; // add | edit
-let editAttendanceClass = "";
-let editAttendanceDate = "";
     
     // --- LOGIKA PRESENSI ---
 function renderAttendanceList() {
@@ -1047,20 +1037,14 @@ async function saveAttendance() {
             }
 
         }
-
     }
 
     await loadAttendanceFromSupabase();
 
-    attendanceMode = "add";
-    editAttendanceClass = "";
-    editAttendanceDate = "";
-
     renderAttendanceList();
     renderRekapPresensi();
 
-    showToast("Presensi berhasil disimpan");
-
+    showToast("Presensi berhasil disimpan.");
 }
 
 async function deleteAttendance(id) {
@@ -1082,19 +1066,8 @@ async function deleteAttendance(id) {
   showToast("Presensi berhasil dihapus");
 }
 
-function openEditAttendance(kelas, tanggal) {
-
-    attendanceMode = "edit";
-
-    editAttendanceClass = kelas;
-
-    editAttendanceDate = tanggal;
-
-    showPage("input-presensi");
-
-}
     
-    async function resetAttendance() {
+async function resetAttendance() {
 
   const classVal =
     document.getElementById('select-attendance-class').value;
@@ -1187,16 +1160,6 @@ function openEditAttendance(kelas, tanggal) {
             ${d.attendance_status}
         </span>
     </td>
-
-    <td class="px-4 py-3 text-center">
-        <button
-            type="button"
-            onclick="openEditAttendance('${d.attendance_class}','${d.attendance_date}')"
-            class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-xs">
-            ✏ Edit
-        </button>
-    </td>
-
 </tr>
 `).join('');
     }
