@@ -406,6 +406,94 @@
     <!-- Modal Add Journal -->
     <div id="modal-add-journal" class="fixed inset-0 z-50 hidden"><div class="modal-backdrop absolute inset-0" onclick="closeModal('modal-add-journal')"></div><div class="absolute inset-0 flex items-center justify-center p-4"><div class="card-glass rounded-2xl w-full max-w-md fade-in p-6"><h3 class="text-xl font-bold text-blue-900 mb-4">Tambah Jurnal</h3><form id="form-add-journal" class="space-y-4"><div><label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal</label><input type="date" id="input-journal-date" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Jam Ke-</label><input type="text" id="input-journal-time" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl" placeholder="Contoh: 1-4"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Kelas</label><select id="input-journal-class" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl bg-white"><option value="">Pilih Kelas</option></select></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Topik</label><input type="text" id="input-journal-topic" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Aktivitas</label><textarea id="input-journal-activity" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl resize-none"></textarea></div><div class="flex gap-3 pt-2"><button type="button" onclick="closeModal('modal-add-journal')" class="flex-1 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl">Batal</button><button type="submit" class="flex-1 btn-primary text-white font-semibold py-2 rounded-xl">Simpan</button></div></form></div></div></div>
 
+    <!-- Modal Edit Presensi -->
+    <div id="modal-edit-attendance" class="fixed inset-0 z-50 hidden"><div class="modal-backdrop absolute inset-0" onclick="closeModal('modal-edit-attendance')"></div><div class="absolute inset-0 flex items-center justify-center p-4"><div class="card-glass rounded-2xl w-full max-w-md fade-in p-6"><h3 class="text-xl font-bold text-blue-900 mb-4">
+      Edit Presensi</h3><input type="hidden" id="edit-attendance-id"><div class="space-y-4"><div>
+<label class="block text-sm font-semibold mb-1">
+Nama Siswa
+</label>
+
+<input
+id="edit-attendance-name"
+readonly
+class="w-full px-4 py-2 border-2 rounded-xl bg-gray-100">
+
+</div>
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Kelas
+</label>
+
+<input
+id="edit-attendance-class"
+readonly
+class="w-full px-4 py-2 border-2 rounded-xl bg-gray-100">
+
+</div>
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Tanggal
+</label>
+
+<input
+id="edit-attendance-date"
+readonly
+class="w-full px-4 py-2 border-2 rounded-xl bg-gray-100">
+
+</div>
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Status
+</label>
+
+<select
+id="edit-attendance-status"
+class="w-full px-4 py-2 border-2 rounded-xl">
+
+<option>Hadir</option>
+<option>Sakit</option>
+<option>Izin</option>
+<option>Alpa</option>
+<option>Dispensasi</option>
+
+</select>
+
+</div>
+
+<div class="flex gap-3 pt-2">
+
+<button
+onclick="closeModal('modal-edit-attendance')"
+class="flex-1 bg-gray-300 py-2 rounded-xl">
+
+Batal
+
+</button>
+
+<button
+onclick="saveEditAttendance()"
+class="flex-1 btn-primary text-white py-2 rounded-xl">
+
+Simpan
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+    
     <!-- Modal Confirm Delete -->
     <div id="modal-confirm" class="fixed inset-0 z-50 hidden"><div class="modal-backdrop absolute inset-0"></div><div class="absolute inset-0 flex items-center justify-center p-4"><div class="card-glass rounded-2xl w-full max-w-sm fade-in p-6 text-center"><h3 class="text-xl font-bold text-red-700 mb-2">Konfirmasi Hapus</h3><p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus data ini?</p><div class="flex gap-3"><button onclick="closeModal('modal-confirm')" class="flex-1 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl">Batal</button><button id="btn-confirm-delete-action" class="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl">Hapus</button></div></div></div></div>
 
