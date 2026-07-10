@@ -964,31 +964,34 @@ function renderAttendanceList() {
 
         const status = exist ? exist.attendance_status : "Hadir";
 
-        return `
-        <div class="bg-white border border-gray-200 p-4 rounded-xl flex justify-between items-center shadow-sm">
+return `
+<div class="bg-white border border-gray-200 p-4 rounded-xl flex justify-between items-center shadow-sm">
 
-            <p class="font-bold text-gray-900">
-                ${s.student_name}
-            </p>
-
-            <select
-                class="attendance-status border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold bg-white"
-                data-name="${s.student_name}"
-                data-id="${exist ? exist.id : ""}">
-
-                <option value="Hadir" ${status==="Hadir"?"selected":""}>✅ Hadir</option>
-                <option value="Sakit" ${status==="Sakit"?"selected":""}>🤒 Sakit</option>
-                <option value="Izin" ${status==="Izin"?"selected":""}>📝 Izin</option>
-                <option value="Alpa" ${status==="Alpa"?"selected":""}>❌ Alpa</option>
-                <option value="Dispensasi" ${status==="Dispensasi"?"selected":""}>📋 Dispensasi</option>
-
-            </select>
-
-        </div>
-        `;
-
+    <p class="font-bold text-gray-900">
+        ${s.student_name}
+    </p>
+    <div class="flex items-center gap-2">
+        <select
+            class="attendance-status border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold bg-white"
+            data-name="${s.student_name}"
+            data-id="${exist ? exist.id : ""}">
+            <option value="Hadir" ${status=="Hadir"?"selected":""}>✅ Hadir</option>
+            <option value="Sakit" ${status=="Sakit"?"selected":""}>🤒 Sakit</option>
+            <option value="Izin" ${status=="Izin"?"selected":""}>📝 Izin</option>
+            <option value="Alpa" ${status=="Alpa"?"selected":""}>❌ Alpa</option>
+            <option value="Dispensasi" ${status=="Dispensasi"?"selected":""}>📋 Dispensasi</option>
+        </select>
+        ${
+            exist
+            ?
+            `<button
+                onclick="deleteAttendance('${exist.id}')"
+                class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg"
+                title="Hapus Presensi">🗑</button>`:""}
+    </div>
+</div>
+`;
     }).join("");
-
 }
 
 async function saveAttendance() {
@@ -1049,6 +1052,10 @@ async function saveAttendance() {
 
 async function deleteAttendance(id) {
 
+  if (!confirm("Yakin ingin menghapus presensi siswa ini?")) {
+      return;
+  }
+
   const { error } = await supabaseClient
     .from('attendance')
     .delete()
@@ -1065,7 +1072,6 @@ async function deleteAttendance(id) {
   renderRekapPresensi();
   showToast("Presensi berhasil dihapus");
 }
-
     
 async function resetAttendance() {
 
