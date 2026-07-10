@@ -1133,6 +1133,13 @@ async function deleteAttendance(id) {
     if(!data){
         showToast("Data tidak ditemukan");
         return;
+      
+      document.getElementById("edit-attendance-id").value=data.id;
+      document.getElementById("edit-attendance-name").value=data.student_name;
+      document.getElementById("edit-attendance-class").value=data.attendance_class;
+      document.getElementById("edit-attendance-date").value=formatDate(data.attendance_date);
+      document.getElementById("edit-attendance-status").value=data.attendance_status;
+      openModal("modal-edit-attendance");
     }
 
     // Input status baru
@@ -1171,6 +1178,44 @@ async function deleteAttendance(id) {
         showToast("Gagal mengubah presensi");
         return;
     }
+
+      async function saveEditAttendance(){
+
+const id =
+document.getElementById("edit-attendance-id").value;
+
+const status =
+document.getElementById("edit-attendance-status").value;
+
+const {error}=await supabaseClient
+
+.from("attendance")
+
+.update({
+
+attendance_status:status
+
+})
+
+.eq("id",id);
+
+if(error){
+
+showToast("Gagal mengubah data");
+
+return;
+
+}
+
+await loadAttendanceFromSupabase();
+
+renderRekapPresensi();
+
+closeModal("modal-edit-attendance");
+
+showToast("Presensi berhasil diperbarui");
+
+}
 
     // Reload data
     await loadAttendanceFromSupabase();
