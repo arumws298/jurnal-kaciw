@@ -1169,14 +1169,36 @@ async function deleteAttendance(id) {
       };
 
       tbody.innerHTML = data.map(d => `
-        <tr class="border-b border-gray-100 hover:bg-gray-50">
-          <td class="px-4 py-3 text-gray-700 text-sm">${formatDate(d.attendance_date)}</td>
-          <td class="px-4 py-3 font-semibold text-gray-900 text-sm">${d.student_name}</td>
-          <td class="px-4 py-3 text-sm">${d.attendance_class}</td>
-          <td class="px-4 py-3 text-center"><span class="${statusColors[d.attendance_status]} px-2 py-1 rounded-full text-xs font-bold">${d.attendance_status}</span></td>
-          <td class="px-4 py-3 text-center"><buttononclick="editAttendance('${d.id}')"class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-xs">✏ Edit</button></td>
-        </tr>
-      `).join('');
+      <tr class="border-b border-gray-100 hover:bg-gray-50">
+      <td class="px-4 py-3 text-gray-700 text-sm">
+        ${formatDate(d.attendance_date)}
+    </td>
+
+    <td class="px-4 py-3 font-semibold text-gray-900 text-sm">
+        ${d.student_name}
+    </td>
+
+    <td class="px-4 py-3 text-sm">
+        ${d.attendance_class}
+    </td>
+
+    <td class="px-4 py-3 text-center">
+        <span class="${statusColors[d.attendance_status]} px-2 py-1 rounded-full text-xs font-bold">
+            ${d.attendance_status}
+        </span>
+    </td>
+
+    <td class="px-4 py-3 text-center">
+        <button
+            type="button"
+            onclick="editAttendance('${d.id}')"
+            class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-xs">
+            ✏ Edit
+        </button>
+    </td>
+
+</tr>
+`).join('');
     }
 
     // --- LOGIKA JURNAL ---
