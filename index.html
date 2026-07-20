@@ -458,47 +458,68 @@ const KOP_URL =
       journals: []
     };
 
+    
 async function loadStudentsFromSupabase() {
-  const { data, error } = await supabaseClient
-    .from('students')
-    .select('*');
+  try {
+    const { data, error } = await supabaseClient
+      .from('students')
+      .select('*');
 
-  if (!error) {
-    allData.students = data;
-  }
-}
+    if (error) {
+      throw error;
+    }
 
-async function loadAttendanceFromSupabase() {
-  const { data, error } = await supabaseClient
-    .from('attendance')
-    .select('*');
+    allData.students = data || [];
 
-  if (!error) {
-    allData.attendance = data;
+  } catch (err) {
+    console.error("Load Students Error:", err);
+    showToast("Gagal memuat data siswa.");
+    allData.students = [];
   }
 }
 
 async function loadJournalsFromSupabase() {
-  const { data, error } = await supabaseClient
-    .from('journals')
-    .select('*');
+  try {
+    const { data, error } = await supabaseClient
+      .from('journals')
+      .select('*');
 
-  if (!error) {
-    allData.journals = data;
+    if (error) {
+      throw error;
+    }
+
+    allData.journals = data || [];
+
+  } catch (err) {
+
+    console.error("Load Journals Error:", err);
+
+    showToast("Gagal memuat data jurnal.");
+
+    allData.journals = [];
   }
 }
     // --- INISIALISASI ---
-async function initApp() {
+  async function initApp() {
 
+  // Ambil gambar kop
   await loadKopImage();
 
+  // Ambil semua data dari Supabase
+  await loadStudentsFromSupabase();
+  await loadAttendanceFromSupabase();
+  await loadJournalsFromSupabase();
+
+  // Isi informasi aplikasi
   document.getElementById('login-school-name').textContent = CONFIG.school_name;
   document.getElementById('header-school-name').textContent = CONFIG.school_name;
   document.getElementById('dashboard-teacher-name').textContent = CONFIG.teacher_name;
   document.getElementById('dashboard-subject').textContent = CONFIG.subject_name;
 
+  // Pasang semua event
   setupEventListeners();
 
+  // Isi dropdown kelas
   updateClassDropdowns();
 }
     // --- FUNGSI UTAMA PENYIMPANAN ---
@@ -679,6 +700,7 @@ if (filterClass)
     }
 
 async function addStudent(e) {
+
   e.preventDefault();
 
   const newStudent = {
@@ -687,25 +709,34 @@ async function addStudent(e) {
     created_at: new Date().toISOString()
   };
 
-  const { error } = await supabaseClient
-    .from('students')
-    .insert([newStudent]);
+  try {
 
-  if (error) {
-    console.error(error);
-    showToast("Gagal menyimpan data");
-    return;
+    const { error } = await supabaseClient
+      .from('students')
+      .insert([newStudent]);
+
+    if (error) {
+      throw error;
+    }
+
+    await loadStudentsFromSupabase();
+
+    renderStudents();
+    updateClassDropdowns();
+
+    document.getElementById('form-add-student').reset();
+    closeModal('modal-add-student');
+
+    showToast("Siswa berhasil ditambahkan");
+
+  } catch (err) {
+
+    console.error("Add Student Error:", err);
+
+    showToast("Gagal menyimpan data siswa.");
+
   }
 
-  await loadStudentsFromSupabase();
-
-  renderStudents();
-  updateClassDropdowns();
-
-  document.getElementById('form-add-student').reset();
-  closeModal('modal-add-student');
-
-  showToast("Siswa berhasil ditambahkan");
 }
 
 let deleteTarget = null;
@@ -751,59 +782,95 @@ async function executeDelete() {
   const selectedClass =
     document.getElementById('filter-student-class').value;
 
-  if (deleteTarget.type === 'student') {
+  try {
 
-    const { error } = await supabaseClient
-      .from('students')
-      .delete()
-      .eq('id', deleteTarget.id);
+    if (deleteTarget.type === 'student') {
 
-    if (error) {
-      console.error(error);
-      showToast("Gagal menghapus siswa");
-      return;
+      const { error } = await supabaseClient
+        .from('students')
+        .delete()
+        .eq('id', deleteTarget.id);
+
+      if (error) {
+        throw error;
+      }
+
+      await loadStudentsFromSupabase();
+
+      updateClassDropdowns();
+
+      document.getElementById('filter-student-class').value =
+        selectedClass;
+
+      renderStudents();
+
+      showToast("Siswa dihapus");
+
+    } else if (deleteTarget.type === 'class_students') {
+
+      const { error } = await supabaseClient
+        .from('students')
+        .delete()
+        .eq('student_class', deleteTarget.className);
+
+      if (error) {
+        throw error;
+      }
+
+      await loadStudentsFromSupabase();
+
+      updateClassDropdowns();
+
+      // RESET FILTER
+      document.getElementById('filter-student-class').value = '';
+
+      renderStudents();
+
+      showToast(
+        `Kelas ${deleteTarget.className} berhasil dihapus`
+      );
+
+    } else if (deleteTarget.type === 'all_students') {
+
+      const { error } = await supabaseClient
+        .from('students')
+        .delete()
+        .gt('created_at', '1900-01-01');
+
+      if (error) {
+        throw error;
+      }
+
+      await loadStudentsFromSupabase();
+
+      renderStudents();
+
+      updateClassDropdowns();
+
+      showToast("Semua siswa berhasil dihapus");
     }
 
-    await loadStudentsFromSupabase();
+  } catch (err) {
 
-    updateClassDropdowns();
+    console.error("Delete Error:", err);
 
-    document.getElementById('filter-student-class').value =
-      selectedClass;
+    showToast("Gagal menghapus data.");
 
-    renderStudents();
+  } finally {
 
-    showToast("Siswa dihapus");
-  }
-    
-else if (deleteTarget.type === 'class_students') {
+    closeModal('modal-confirm');
 
-  const { error } = await supabaseClient
-    .from('students')
-    .delete()
-    .eq('student_class', deleteTarget.className);
+    deleteTarget = null;
 
-  if (error) {
-    console.error(error);
-    showToast("Gagal menghapus kelas");
-    return;
   }
 
-  await loadStudentsFromSupabase();
-
-  updateClassDropdowns();
-
-  // RESET FILTER
-  document.getElementById('filter-student-class').value = '';
-
-  renderStudents();
-
-  showToast(
-    `Kelas ${deleteTarget.className} berhasil dihapus`
-  );
 }
     
-  else if (deleteTarget.type === 'all_students') {
+async function deleteAllStudents() {
+
+  if (!confirm("Yakin hapus SEMUA data siswa?")) return;
+
+  try {
 
     const { error } = await supabaseClient
       .from('students')
@@ -811,44 +878,25 @@ else if (deleteTarget.type === 'class_students') {
       .gt('created_at', '1900-01-01');
 
     if (error) {
-      console.error(error);
-      showToast("Gagal menghapus semua siswa");
-      return;
+      throw error;
     }
 
     await loadStudentsFromSupabase();
 
     renderStudents();
+
     updateClassDropdowns();
 
-    showToast("Semua siswa berhasil dihapus");
+    showToast("Semua data siswa berhasil dihapus");
+
+  } catch (err) {
+
+    console.error("Delete All Students Error:", err);
+
+    showToast("Gagal menghapus semua siswa.");
+
   }
 
-  closeModal('modal-confirm');
-  deleteTarget = null;
-}
-    
-async function deleteAllStudents() {
-
-  if (!confirm("Yakin hapus SEMUA data siswa?")) return;
-
-  const { error } = await supabaseClient
-    .from('students')
-    .delete()
-    .gt('created_at', '1900-01-01');
-
-  if (error) {
-    console.error(error);
-    alert(error.message);
-    return;
-  }
-
-  showToast("Semua data siswa berhasil dihapus");
-
-  await loadStudentsFromSupabase();
-
-  renderStudents();
-  updateClassDropdowns();
 }
   
     // --- IMPORT EXCEL ---
@@ -1005,49 +1053,57 @@ async function saveAttendance() {
         return;
     }
 
-    for (const sel of selects) {
+    try {
 
-        const data = {
-            student_name: sel.dataset.name,
-            attendance_class: classVal,
-            attendance_date: dateVal,
-            attendance_status: sel.value
-        };
+        for (const sel of selects) {
 
-        if (sel.dataset.id) {
+            const data = {
+                student_name: sel.dataset.name,
+                attendance_class: classVal,
+                attendance_date: dateVal,
+                attendance_status: sel.value
+            };
 
-            // EDIT DATA
-            const { error } = await supabaseClient
-                .from("attendance")
-                .update(data)
-                .eq("id", sel.dataset.id);
+            if (sel.dataset.id) {
 
-            if (error) {
-                console.error(error);
+                const { error } = await supabaseClient
+                    .from("attendance")
+                    .update(data)
+                    .eq("id", sel.dataset.id);
+
+                if (error) {
+                    throw error;
+                }
+
+            } else {
+
+                data.created_at = new Date().toISOString();
+
+                const { error } = await supabaseClient
+                    .from("attendance")
+                    .insert([data]);
+
+                if (error) {
+                    throw error;
+                }
+
             }
-
-        } else {
-
-            // TAMBAH DATA BARU
-            data.created_at = new Date().toISOString();
-
-            const { error } = await supabaseClient
-                .from("attendance")
-                .insert([data]);
-
-            if (error) {
-                console.error(error);
-            }
-
         }
+
+        await loadAttendanceFromSupabase();
+
+        renderAttendanceList();
+        renderRekapPresensi();
+
+        showToast("Presensi berhasil disimpan.");
+
+    } catch (err) {
+
+        console.error("Save Attendance Error:", err);
+
+        showToast("Gagal menyimpan presensi.");
+
     }
-
-    await loadAttendanceFromSupabase();
-
-    renderAttendanceList();
-    renderRekapPresensi();
-
-    showToast("Presensi berhasil disimpan.");
 }
 
 async function deleteAttendance(id) {
@@ -1218,23 +1274,33 @@ if(fMonth)
     created_at: new Date().toISOString()
   };
 
-  const { error } = await supabaseClient
-    .from('journals')
-    .insert([journalData]);
+  try {
 
-  if (error) {
-    console.error(error);
-    showToast("Gagal menyimpan jurnal");
-    return;
+    const { error } = await supabaseClient
+      .from('journals')
+      .insert([journalData]);
+
+    if (error) {
+      throw error;
+    }
+
+    await loadJournalsFromSupabase();
+
+    closeModal('modal-add-journal');
+    document.getElementById('form-add-journal').reset();
+
+    renderRekapJurnal();
+
+    showToast("Jurnal berhasil ditambahkan");
+
+  } catch (err) {
+
+    console.error("Add Journal Error:", err);
+
+    showToast("Gagal menyimpan jurnal.");
+
   }
 
-  await loadJournalsFromSupabase();
-
-  closeModal('modal-add-journal');
-  document.getElementById('form-add-journal').reset();
-
-  renderRekapJurnal();
-  showToast("Jurnal berhasil ditambahkan");
 }
 
     // --- PDF GENERATION ---
@@ -1600,15 +1666,7 @@ async function testConnection() {
 
 // --- START APP ---
 window.addEventListener('DOMContentLoaded', async () => {
-
-await loadStudentsFromSupabase();
-await loadAttendanceFromSupabase();
-await loadJournalsFromSupabase();
-
-  initApp();
-
-  renderStudents();
-  updateClassDropdowns();
+  await initApp();
 });
   </script>
 </body>
