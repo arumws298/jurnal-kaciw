@@ -478,6 +478,31 @@ async function loadStudentsFromSupabase() {
   }
 }
 
+// =========================
+// LOAD DATA PRESENSI
+// =========================
+async function loadAttendanceFromSupabase() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('attendance')
+      .select('*');
+
+    if (error) {
+      throw error;
+    }
+
+    allData.attendance = data || [];
+
+  } catch (err) {
+
+    console.error("Load Attendance Error:", err);
+
+    showToast("Gagal memuat data presensi.");
+
+    allData.attendance = [];
+  }
+}
+
 async function loadJournalsFromSupabase() {
   try {
     const { data, error } = await supabaseClient
