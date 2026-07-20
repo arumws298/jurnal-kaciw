@@ -1582,7 +1582,6 @@ async function downloadPresensiMonthlyPDF() {
        Silakan tempel versi lengkap yang telah disiapkan atau lanjutkan
        pengembangan sesuai kebutuhan. */
     showToast("Fungsi PDF Bulanan perlu ditempelkan dengan versi final.");
-}
 
 // Urutkan berdasarkan tanggal
 presensi.sort((a, b) =>
@@ -1614,7 +1613,8 @@ presensi.sort((a, b) =>
   }
 
 doc.save(`Presensi_${(kelas || "Semua_Kelas").replace(/\s+/g,"_")}_${periode.replace(/\s+/g,"_")}.pdf`);
-
+}
+    }
     // --- EVENT LISTENERS SETUP ---
     function setupEventListeners() {
       // Login
