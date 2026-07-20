@@ -1448,24 +1448,72 @@ if(fMonth)
 
 }
     // --- PDF GENERATION ---
-    function addSignatures(doc, y) {
-      doc.setFontSize(10);
-      doc.text("Mengetahui,", 20, y);
-      doc.text("Kepala Sekolah", 20, y+5);
-      doc.text("", 20, y+25);
-      doc.setFont(undefined, 'bold');
-      doc.text(CONFIG.principal_name, 20, y+30);
-      doc.setFont(undefined, 'normal');
-      doc.text(`NIP. ${CONFIG.principal_nip}`, 20, y+35);
+function addSignatures(doc, y) {
 
-      doc.text("Tangerang, " + formatDateSignature(new Date()), 130, y);
-      doc.text("Guru Mata Pelajaran", 130, y+5);
-      doc.text("", 130, y+25);
-      doc.setFont(undefined, 'bold');
-      doc.text(CONFIG.teacher_name, 130, y+30);
-      doc.setFont(undefined, 'normal');
-      doc.text(`NIP. ${CONFIG.teacher_nip}`, 130, y+35);
-    }
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const leftX = 20;
+    const rightX = pageWidth - 20;
+
+    doc.setFontSize(10);
+
+    // =======================
+    // KEPALA SEKOLAH
+    // =======================
+
+    doc.setFont(undefined, "normal");
+    doc.text("Mengetahui,", leftX, y);
+    doc.text("Kepala Sekolah", leftX, y + 5);
+
+    // Ruang tanda tangan
+    doc.text(" ", leftX, y + 25);
+
+    doc.setFont(undefined, "bold");
+    doc.text(CONFIG.principal_name, leftX, y + 30);
+
+    doc.setFont(undefined, "normal");
+    doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 35);
+
+    // =======================
+    // GURU MATA PELAJARAN
+    // =======================
+
+    doc.text(
+        `Tangerang, ${formatDateSignature(new Date())}`,
+        rightX,
+        y,
+        { align: "right" }
+    );
+
+    doc.text(
+        "Guru Mata Pelajaran",
+        rightX,
+        y + 5,
+        { align: "right" }
+    );
+
+    // Ruang tanda tangan
+    doc.text(" ", rightX, y + 25, {
+        align: "right"
+    });
+
+    doc.setFont(undefined, "bold");
+    doc.text(
+        CONFIG.teacher_name,
+        rightX,
+        y + 30,
+        { align: "right" }
+    );
+
+    doc.setFont(undefined, "normal");
+    doc.text(
+        `NIP. ${CONFIG.teacher_nip}`,
+        rightX,
+        y + 35,
+        { align: "right" }
+    );
+
+}
 //-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
       const { jsPDF } = window.jspdf;
@@ -1857,7 +1905,7 @@ const legendY = pageHeight - 40;
 
 drawAttendanceLegend(doc, legendY);
 
-addSignatures(doc, pageHeight - 25);
+addSignatures(doc, pageHeight - 34);
 
 // ======================
 // SIMPAN PDF
