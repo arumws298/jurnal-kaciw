@@ -1476,14 +1476,19 @@ function addSignatures(doc, y) {
     // ==========================
 
     doc.setFont(undefined, "normal");
-    doc.text(`Tangerang, ${formatDateSignature(new Date())}`, rightX, y);
-    doc.text("Guru Mata Pelajaran", rightX, y + 5);
+    const rightX = pageWidth - 75; // sesuaikan jika perlu
 
-    doc.setFont(undefined, "bold");
-    doc.text(CONFIG.teacher_name, rightX, y + 30);
+doc.text(
+    `Tangerang, ${formatDateSignature(new Date())}\nGuru Mata Pelajaran`,
+    rightX,
+    y
+);
 
-    doc.setFont(undefined, "normal");
-    doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 35);
+doc.setFont("helvetica", "bold");
+doc.text(GURU_NAMA, rightX, y + 45);
+
+doc.setFont("helvetica", "normal");
+doc.text(`NIP. ${GURU_NIP}`, rightX, y + 52);
 }
 //-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
@@ -1687,7 +1692,7 @@ async function downloadPresensiMonthlyPDF() {
     const { jsPDF } = window.jspdf;
 
     const doc = new jsPDF({
-        orientation: "landscape",
+        orientation: "potrait",
         unit: "mm",
         format: "a4"
     });
@@ -1770,7 +1775,7 @@ async function downloadPresensiMonthlyPDF() {
 // ======================
 
 if (KOP_IMAGE) {
-    doc.addImage(KOP_IMAGE, "PNG", 10, 8, 277, 25);
+    doc.addImage(KOP_IMAGE, "PNG", 10, 8, 190, 20);
 }
 
 doc.setFont("helvetica","bold");
@@ -1868,13 +1873,11 @@ const finalY = doc.lastAutoTable.finalY + 8;
 // TANDA TANGAN
 // ======================
 
-const pageHeight = doc.internal.pageSize.getHeight();
+const finalY = doc.lastAutoTable.finalY;
 
-const legendY = pageHeight - 40;
+drawAttendanceLegend(doc, finalY + 10);
 
-drawAttendanceLegend(doc, legendY);
-
-addSignatures(doc, pageHeight - 34);
+addSignatures(doc, finalY + 20);
 
 // ======================
 // SIMPAN PDF
