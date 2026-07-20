@@ -599,17 +599,17 @@ async function loadJournalsFromSupabase() {
       setTimeout(() => toast.classList.add('hidden'), 3000);
     }
 
-   function formatDate(dateStr) {
+function formatDate(dateStr) {
     if (!dateStr) return "";
     const date = new Date(dateStr);
     const hari = String(date.getDate()).padStart(2, '0');
     const bulan = String(date.getMonth() + 1).padStart(2, '0');
     const tahun = date.getFullYear();
-     
+
     return `${hari}/${bulan}/${tahun}`;
 }
 
-    function formatDateLong(dateStr) {
+function formatDateLong(dateStr) {
     if (!dateStr) return "";
 
     const options = {
@@ -618,9 +618,11 @@ async function loadJournalsFromSupabase() {
         month: 'long',
         year: 'numeric'
     };
+
     return new Date(dateStr).toLocaleDateString('id-ID', options);
 }
-    function formatDateSignature(dateStr) {
+
+function formatDateSignature(dateStr) {
     if (!dateStr) return "";
 
     const options = {
@@ -631,13 +633,97 @@ async function loadJournalsFromSupabase() {
 
     return new Date(dateStr).toLocaleDateString('id-ID', options);
 }
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-    function getClasses() {
-      const classes = [...new Set(allData.students.map(s => s.student_class))].sort();
-      return classes;
+/* ===========================
+   HELPER PDF PRESENSI BULANAN
+=========================== */
+
+function formatDateShort(dateStr) {
+    if (!dateStr) return "";
+
+    return new Date(dateStr).toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "2-digit"
+    }).replace(".", "");
+}
+
+function getAttendanceColor(status) {
+
+    switch (status) {
+
+        case "Hadir":
+            return [34, 197, 94];
+
+        case "Izin":
+            return [59, 130, 246];
+
+        case "Sakit":
+            return [250, 204, 21];
+
+        case "Dispensasi":
+            return [168, 85, 247];
+
+        case "Alpa":
+            return [239, 68, 68];
+
+        default:
+            return [255, 255, 255];
     }
+}
+
+function getAttendanceStatus(studentName, date, className, data) {
+
+    const item = data.find(a =>
+        a.student_name === studentName &&
+        a.attendance_date === date &&
+        a.attendance_class === className
+    );
+
+    return item ? item.attendance_status : "";
+}
+
+function drawAttendanceLegend(doc, startY) {
+
+    const legend = [
+        { text: "Hadir", color: [34,197,94] },
+        { text: "Izin", color: [59,130,246] },
+        { text: "Sakit", color: [250,204,21] },
+        { text: "Dispensasi", color: [168,85,247] },
+        { text: "Alpa", color: [239,68,68] }
+    ];
+
+    let x = 14;
+
+    legend.forEach(item => {
+
+        doc.setFillColor(...item.color);
+        doc.rect(x, startY, 5, 5, "F");
+
+        doc.setTextColor(0);
+        doc.setFontSize(8);
+        doc.text(item.text, x + 7, startY + 4);
+
+        x += 35;
+    });
+}
+
+/* ===========================
+   END HELPER PDF
+=========================== */
+
+function openModal(id) {
+    document.getElementById(id).classList.remove('hidden');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+}
+
+function getClasses() {
+    const classes = [...new Set(allData.students.map(s => s.student_class))].sort();
+    return classes;
+}
 
    function updateClassDropdowns() {
   const classes = getClasses();
@@ -1578,43 +1664,218 @@ doc.save(`Jurnal_${(kelas || "Semua_Kelas").replace(/\s+/g,"_")}_${periode.repla
     
 //----- DOWNLOAD PRESENSI BULANAN-----
 async function downloadPresensiMonthlyPDF() {
-    /* Fungsi PDF Bulanan telah diperbarui.
-       Silakan tempel versi lengkap yang telah disiapkan atau lanjutkan
-       pengembangan sesuai kebutuhan. */
-    showToast("Fungsi PDF Bulanan perlu ditempelkan dengan versi final.");
 
-// Urutkan berdasarkan tanggal
-presensi.sort((a, b) =>
-    new Date(a.attendance_date) - new Date(b.attendance_date)
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4"
+    });
+
+    const kelas = document.getElementById("filter-rekap-class").value;
+    const periode = document.getElementById("filter-rekap-month").value;
+
+    if (!kelas) {
+        showToast("Pilih kelas terlebih dahulu.");
+        return;
+    }
+
+    if (!periode) {
+        showToast("Pilih bulan terlebih dahulu.");
+        return;
+    }
+
+    let presensi = allData.attendance.filter(a =>
+        a.attendance_class === kelas &&
+        a.attendance_date.startsWith(periode)
+    );
+
+    if (presensi.length === 0) {
+        showToast("Tidak ada data presensi.");
+        return;
+    }
+
+    presensi.sort((a,b)=>
+        new Date(a.attendance_date)-new Date(b.attendance_date)
+    );
+
+    const dates=[
+
+        ...new Set(
+            presensi.map(a=>a.attendance_date)
+        )
+
+    ];
+
+    const students=
+
+        allData.students
+        .filter(s=>s.student_class===kelas)
+        .sort((a,b)=>
+            a.student_name.localeCompare(
+                b.student_name,
+                "id"
+            )
+        );
+
+    const head=[
+        "Nama Siswa",
+        ...dates.map(formatDateShort)
+    ];
+
+    const body=[];
+
+    students.forEach(student=>{
+
+        const row=[student.student_name];
+
+        dates.forEach(date=>{
+
+            row.push(
+                getAttendanceStatus(
+                    student.student_name,
+                    date,
+                    kelas,
+                    presensi
+                )
+            );
+
+        });
+
+        body.push(row);
+
+    });
+// ======================
+// KOP SEKOLAH
+// ======================
+
+if (KOP_IMAGE) {
+    doc.addImage(KOP_IMAGE, "PNG", 10, 8, 277, 25);
+}
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(14);
+doc.text("REKAP PRESENSI BULANAN",148,40,{align:"center"});
+
+doc.setFontSize(10);
+doc.setFont("helvetica","normal");
+doc.text(`Kelas : ${kelas}`,14,48);
+doc.text(`Periode : ${periode}`,14,54);
+
+// ======================
+// TABEL
+// ======================
+
+doc.autoTable({
+
+    startY:60,
+
+    head:[head],
+
+    body:body,
+
+    theme:"grid",
+
+    styles:{
+        fontSize:8,
+        halign:"center",
+        valign:"middle",
+        lineWidth:0.2,
+        lineColor:[180,180,180],
+        textColor:[0,0,0]
+    },
+
+    headStyles:{
+        fillColor:[30,64,175],
+        textColor:[255,255,255],
+        fontStyle:"bold"
+    },
+
+    columnStyles:{
+        0:{
+            cellWidth:55,
+            halign:"left"
+        }
+    },
+
+    didParseCell:function(data){
+
+        if(data.section!=="body") return;
+
+        if(data.column.index===0) return;
+
+        const status=data.cell.raw;
+
+        data.cell.text=[""];
+
+        switch(status){
+
+            case "Hadir":
+                data.cell.styles.fillColor=[34,197,94];
+                break;
+
+            case "Izin":
+                data.cell.styles.fillColor=[59,130,246];
+                break;
+
+            case "Sakit":
+                data.cell.styles.fillColor=[250,204,21];
+                break;
+
+            case "Dispensasi":
+                data.cell.styles.fillColor=[168,85,247];
+                break;
+
+            case "Alpa":
+                data.cell.styles.fillColor=[239,68,68];
+                break;
+
+            default:
+                data.cell.styles.fillColor=[255,255,255];
+        }
+
+    }
+
+});
+
+  // ======================
+// LEGEND WARNA
+// ======================
+
+const finalY = doc.lastAutoTable.finalY + 8;
+
+drawAttendanceLegend(doc, finalY);
+
+// ======================
+// TANDA TANGAN
+// ======================
+
+const signY = finalY + 12;
+
+if (signY > 175) {
+
+    doc.addPage();
+
+    drawAttendanceLegend(doc, 20);
+
+    addSignatures(doc, 35);
+
+} else {
+
+    addSignatures(doc, signY);
+
+}
+
+// ======================
+// SIMPAN PDF
+// ======================
+
+doc.save(
+    `Presensi_${kelas.replace(/\s+/g,"_")}_${periode.replace(/\s+/g,"_")}.pdf`
 );
 
-  const data = presensi.map(a=>[
-      formatDateLong(a.attendance_date),
-      a.student_name,
-      a.attendance_class,
-      a.attendance_status
-  ]);
-
-  doc.autoTable({
-      startY:90,
-      head:[['Tanggal','Nama','Kelas','Status']],
-      body:data,
-      theme:'grid',
-      headStyles:{fillColor:[30,64,175]}
-  });
-
-  const finalY = doc.lastAutoTable.finalY + 20;
-
-  if(finalY < 250)
-      addSignatures(doc, finalY);
-  else{
-      doc.addPage();
-      addSignatures(doc,20);
-  }
-
-doc.save(`Presensi_${(kelas || "Semua_Kelas").replace(/\s+/g,"_")}_${periode.replace(/\s+/g,"_")}.pdf`);
 }
-    }
     // --- EVENT LISTENERS SETUP ---
     function setupEventListeners() {
       // Login
