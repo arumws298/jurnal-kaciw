@@ -1851,21 +1851,13 @@ drawAttendanceLegend(doc, finalY);
 // TANDA TANGAN
 // ======================
 
-const signY = finalY + 12;
+const pageHeight = doc.internal.pageSize.getHeight();
 
-if (signY > 175) {
+const legendY = pageHeight - 40;
 
-    doc.addPage();
+drawAttendanceLegend(doc, legendY);
 
-    drawAttendanceLegend(doc, 20);
-
-    addSignatures(doc, 35);
-
-} else {
-
-    addSignatures(doc, signY);
-
-}
+addSignatures(doc, pageHeight - 25);
 
 // ======================
 // SIMPAN PDF
