@@ -1453,20 +1453,17 @@ function addSignatures(doc, y) {
     const pageWidth = doc.internal.pageSize.getWidth();
 
     const leftX = 20;
-    const rightX = pageWidth - 20;
+    const rightX = pageWidth - 75; // posisi awal blok kanan
 
     doc.setFontSize(10);
 
-    // =======================
+    // ==========================
     // KEPALA SEKOLAH
-    // =======================
+    // ==========================
 
     doc.setFont(undefined, "normal");
     doc.text("Mengetahui,", leftX, y);
     doc.text("Kepala Sekolah", leftX, y + 5);
-
-    // Ruang tanda tangan
-    doc.text(" ", leftX, y + 25);
 
     doc.setFont(undefined, "bold");
     doc.text(CONFIG.principal_name, leftX, y + 30);
@@ -1474,45 +1471,19 @@ function addSignatures(doc, y) {
     doc.setFont(undefined, "normal");
     doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 35);
 
-    // =======================
-    // GURU MATA PELAJARAN
-    // =======================
-
-    doc.text(
-        `Tangerang, ${formatDateSignature(new Date())}`,
-        rightX,
-        y,
-        { align: "right" }
-    );
-
-    doc.text(
-        "Guru Mata Pelajaran",
-        rightX,
-        y + 5,
-        { align: "right" }
-    );
-
-    // Ruang tanda tangan
-    doc.text(" ", rightX, y + 25, {
-        align: "right"
-    });
-
-    doc.setFont(undefined, "bold");
-    doc.text(
-        CONFIG.teacher_name,
-        rightX,
-        y + 30,
-        { align: "right" }
-    );
+    // ==========================
+    // GURU MAPEL
+    // ==========================
 
     doc.setFont(undefined, "normal");
-    doc.text(
-        `NIP. ${CONFIG.teacher_nip}`,
-        rightX,
-        y + 35,
-        { align: "right" }
-    );
+    doc.text(`Tangerang, ${formatDateSignature(new Date())}`, rightX, y);
+    doc.text("Guru Mata Pelajaran", rightX, y + 5);
 
+    doc.setFont(undefined, "bold");
+    doc.text(CONFIG.teacher_name, rightX, y + 30);
+
+    doc.setFont(undefined, "normal");
+    doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 35);
 }
 //-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
@@ -1892,8 +1863,6 @@ doc.autoTable({
 // ======================
 
 const finalY = doc.lastAutoTable.finalY + 8;
-
-drawAttendanceLegend(doc, finalY);
 
 // ======================
 // TANDA TANGAN
