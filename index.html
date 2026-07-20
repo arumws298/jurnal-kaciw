@@ -934,28 +934,40 @@ async function importExcel(e) {
       }
     });
 
-    const { error } = await supabaseClient
-      .from('students')
-      .insert(studentsToInsert);
-    
-console.log("DATA IMPORT:", studentsToInsert);
-console.log("ERROR:", error);
-    
-    if (error) {
-      alert('Gagal import: ' + error.message);
-      console.error(error);
-      return;
+    try {
+
+      const { error } = await supabaseClient
+        .from('students')
+        .insert(studentsToInsert);
+
+      if (error) {
+        throw error;
+      }
+
+      console.log("DATA IMPORT:", studentsToInsert);
+
+      await loadStudentsFromSupabase();
+
+      renderStudents();
+
+      updateClassDropdowns();
+
+      showToast(`${studentsToInsert.length} siswa berhasil diupload!`);
+
+    } catch (err) {
+
+      console.error("Import Excel Error:", err);
+
+      showToast("Gagal mengimpor data siswa.");
+
+    } finally {
+
+      e.target.value = '';
+
     }
-
-    showToast(`${studentsToInsert.length} siswa berhasil diupload!`);
-
-    await loadStudentsFromSupabase();
-    renderStudents();
-    updateClassDropdowns();
-
-    e.target.value = '';
   };
-reader.readAsArrayBuffer(file);
+
+  reader.readAsArrayBuffer(file);
 }
   async function deleteClassStudents() {
   const selectedClass =
@@ -1112,21 +1124,33 @@ async function deleteAttendance(id) {
       return;
   }
 
-  const { error } = await supabaseClient
-    .from('attendance')
-    .delete()
-    .eq('id', id);
+  try {
 
-  if (error) {
-    console.error(error);
-    showToast("Gagal menghapus presensi");
-    return;
+    const { error } = await supabaseClient
+      .from('attendance')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      throw error;
+    }
+
+    await loadAttendanceFromSupabase();
+
+    renderAttendanceList();
+
+    renderRekapPresensi();
+
+    showToast("Presensi berhasil dihapus");
+
+  } catch (err) {
+
+    console.error("Delete Attendance Error:", err);
+
+    showToast("Gagal menghapus presensi.");
+
   }
 
-  await loadAttendanceFromSupabase();
-  renderAttendanceList();
-  renderRekapPresensi();
-  showToast("Presensi berhasil dihapus");
 }
     
 async function resetAttendance() {
@@ -1145,26 +1169,35 @@ async function resetAttendance() {
   if (!confirm("Hapus semua presensi kelas ini?"))
     return;
 
-  const { error } = await supabaseClient
-    .from('attendance')
-    .delete()
-    .eq('attendance_class', classVal)
-    .eq('attendance_date', dateVal);
+  try {
 
-  if (error) {
-    console.error(error);
-    showToast("Gagal menghapus presensi");
-    return;
+    const { error } = await supabaseClient
+      .from('attendance')
+      .delete()
+      .eq('attendance_class', classVal)
+      .eq('attendance_date', dateVal);
+
+    if (error) {
+      throw error;
+    }
+
+    await loadAttendanceFromSupabase();
+
+    renderAttendanceList();
+
+    renderRekapPresensi();
+
+    showToast("Presensi berhasil dihapus");
+
+  } catch (err) {
+
+    console.error("Reset Attendance Error:", err);
+
+    showToast("Gagal menghapus presensi.");
+
   }
 
-  await loadAttendanceFromSupabase();
-
-  renderAttendanceList();
-  renderRekapPresensi();
-
-  showToast("Presensi berhasil dihapus");
 }
-
     // --- LOGIKA REKAP PRESENSI ---
     function renderRekapPresensi() {
       const fClass = document.getElementById('filter-rekap-class').value;
@@ -1265,7 +1298,7 @@ if(fMonth)
 
   e.preventDefault();
 
-  const journalData = {
+  const newJournal = {
     journal_date: document.getElementById('input-journal-date').value,
     journal_time: document.getElementById('input-journal-time').value,
     journal_class: document.getElementById('input-journal-class').value,
@@ -1278,7 +1311,7 @@ if(fMonth)
 
     const { error } = await supabaseClient
       .from('journals')
-      .insert([journalData]);
+      .insert([newJournal]);
 
     if (error) {
       throw error;
@@ -1286,10 +1319,11 @@ if(fMonth)
 
     await loadJournalsFromSupabase();
 
-    closeModal('modal-add-journal');
+    renderRekapJurnal();
+
     document.getElementById('form-add-journal').reset();
 
-    renderRekapJurnal();
+    closeModal('modal-add-journal');
 
     showToast("Jurnal berhasil ditambahkan");
 
@@ -1302,7 +1336,6 @@ if(fMonth)
   }
 
 }
-
     // --- PDF GENERATION ---
     function addSignatures(doc, y) {
       doc.setFontSize(10);
