@@ -1579,54 +1579,228 @@ doc.save(`Jurnal_${(kelas || "Semua_Kelas").replace(/\s+/g,"_")}_${periode.repla
 //----- DOWNLOAD PRESENSI BULANAN-----
 async function downloadPresensiMonthlyPDF() {
 
-  const bulan = document.getElementById('filter-rekap-month').value;
-  const kelas =document.getElementById('filter-rekap-class').value;
+    const bulan = document.getElementById("filter-rekap-month").value;
+    const kelas = document.getElementById("filter-rekap-class").value;
 
-  if (!bulan) {
-    showToast("Pilih bulan terlebih dahulu");
-    return;
-  }
+    if (!bulan) {
+        showToast("Pilih bulan terlebih dahulu");
+        return;
+    }
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.addImage(KOP_IMAGE, 'PNG', 10, 5, 190, 42);
-  
-  const namaBulan=[
-    "Januari","Februari","Maret","April","Mei","Juni",
-    "Juli","Agustus","September","Oktober","November","Desember"
-  ];
+    if (!kelas) {
+        showToast("Pilih kelas terlebih dahulu");
+        return;
+    }
 
-  const [tahun,bln]=bulan.split("-");
-  const periode=`${namaBulan[parseInt(bln)-1]} ${tahun}`;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("landscape");
 
-  doc.setFontSize(16);
-  doc.setFont(undefined,'bold');
-  doc.text("LAPORAN PRESENSI SISWA",105,54,{align:'center'});
+    if (KOP_IMAGE) {
+        doc.addImage(KOP_IMAGE, "PNG", 10, 5, 277, 42);
+    }
 
-  doc.setFontSize(11);
-  doc.setFont(undefined,'normal');
-  doc.text(`Periode : ${periode}`,105,61,{align:'center'});
-//-FORMAT PENULISAN 
-doc.text("Kelas",14,69);
-doc.text(":",50,69);
-doc.text(kelas || "Semua Kelas",54,69);
+    const namaBulan = [
+        "Januari","Februari","Maret","April","Mei","Juni",
+        "Juli","Agustus","September","Oktober","November","Desember"
+    ];
 
-doc.text("Nama",14,75);
-doc.text(":",50,75);
-doc.text(CONFIG.teacher_name,54,75);
+    const [tahun, bln] = bulan.split("-");
+    const periode = `${namaBulan[parseInt(bln)-1]} ${tahun}`;
 
-doc.text("Mata Pelajaran",14,81);
-doc.text(":",50,81);
-doc.text(CONFIG.subject_name,54,81);
+    doc.setFontSize(16);
+    doc.setFont(undefined,"bold");
+    doc.text("REKAP PRESENSI BULANAN",148,54,{align:"center"});
 
-const presensi = allData.attendance.filter(a => {
-const cocokBulan =a.attendance_date.startsWith(bulan);
-const cocokKelas =kelas ? a.attendance_class===kelas : true;
-return cocokBulan && cocokKelas;
-});
-  if (presensi.length === 0) {
-    showToast("Tidak ada data presensi pada periode tersebut");
-    return;
+    doc.setFont(undefined,"normal");
+    doc.setFontSize(11);
+
+    doc.text(`Periode : ${periode}`,148,61,{align:"center"});
+
+    doc.text("Kelas",14,70);
+    doc.text(":",45,70);
+    doc.text(kelas,50,70);
+
+    doc.text("Guru",14,76);
+    doc.text(":",45,76);
+    doc.text(CONFIG.teacher_name,50,76);
+
+    doc.text("Mapel",14,82);
+    doc.text(":",45,82);
+    doc.text(CONFIG.subject_name,50,82);
+
+    // ===========================
+    // DATA PRESENSI
+    // ===========================
+
+    const presensi = allData.attendance.filter(a =>
+        a.attendance_class === kelas &&
+        a.attendance_date.startsWith(bulan)
+    );
+
+    if (presensi.length === 0) {
+        showToast("Tidak ada data presensi.");
+        return;
+    }
+
+    // ===========================
+    // TANGGAL PERTEMUAN
+    // ===========================
+
+    const tanggalPertemuan = [...new Set(
+        presensi.map(a => a.attendance_date)
+    )].sort();
+
+    // ===========================
+    // HEADER
+    // ===========================
+
+    const head = [[
+        "No",
+        "Nama Siswa",
+        ...tanggalPertemuan.map(t => {
+
+            const d = new Date(t);
+
+            return d.toLocaleDateString("id-ID",{
+                day:"numeric",
+                month:"short"
+            });
+
+        })
+    ]];
+
+    // ===========================
+    // DAFTAR SISWA
+    // ===========================
+
+    const siswa = allData.students
+        .filter(s => s.student_class === kelas)
+        .sort((a,b)=>
+            a.student_name.localeCompare(b.student_name,"id")
+        );
+
+    // ===========================
+    // BODY
+    // ===========================
+
+    const body = siswa.map((s,index)=>{
+
+        const row = [
+            index+1,
+            s.student_name
+        ];
+
+        tanggalPertemuan.forEach(tgl=>{
+
+            const absen = presensi.find(a=>
+
+                a.student_name===s.student_name &&
+                a.attendance_date===tgl
+
+            );
+
+            if(!absen){
+                row.push("-");
+                return;
+            }
+
+            switch(absen.attendance_status){
+
+                case "Hadir":
+                    row.push("H");
+                    break;
+
+                case "Sakit":
+                    row.push("S");
+                    break;
+
+                case "Izin":
+                    row.push("I");
+                    break;
+
+                case "Alpa":
+                    row.push("A");
+                    break;
+
+                case "Dispensasi":
+                    row.push("D");
+                    break;
+
+                default:
+                    row.push("-");
+            }
+
+        });
+
+        return row;
+
+    });
+
+    // ===========================
+    // TABEL
+    // ===========================
+
+    doc.autoTable({
+
+        startY:90,
+
+        head,
+
+        body,
+
+        theme:"grid",
+
+        styles:{
+            fontSize:8,
+            halign:"center",
+            valign:"middle"
+        },
+
+        headStyles:{
+            fillColor:[30,64,175],
+            textColor:255,
+            fontStyle:"bold"
+        },
+
+        columnStyles:{
+            0:{cellWidth:10},
+            1:{cellWidth:60,halign:"left"}
+        }
+
+    });
+
+    // ===========================
+    // KETERANGAN
+    // ===========================
+
+    let y = doc.lastAutoTable.finalY + 10;
+
+    doc.setFontSize(9);
+
+    doc.text(
+        "Keterangan : H = Hadir | S = Sakit | I = Izin | A = Alpa | D = Dispensasi",
+        14,
+        y
+    );
+
+    y += 15;
+
+    if(y < 175){
+
+        addSignatures(doc,y);
+
+    }else{
+
+        doc.addPage();
+
+        addSignatures(doc,20);
+
+    }
+
+    doc.save(
+        `Rekap_Presensi_${kelas.replace(/\s+/g,"_")}_${periode.replace(/\s+/g,"_")}.pdf`
+    );
+
 }
 
 // Urutkan berdasarkan tanggal
