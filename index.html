@@ -1601,29 +1601,18 @@ doc.autoTable({
     },
 
     headStyles: {
-        fillColor: [30,64,175],
+        fillColor: [30, 64, 175],
         textColor: [255,255,255],
         halign: "center",
         fontStyle: "bold"
     },
 
     columnStyles: {
-        0:{ cellWidth:34 },
-        1:{ cellWidth:12, halign:"center" },
-        2:{ cellWidth:22, halign:"center", valign:"middle" },
-        3:{ cellWidth:48, halign:"center", valign:"middle" },
-        4:{ cellWidth:"auto" }
-    }, // <-- koma di sini WAJIB
-
-    didParseCell: function(data){
-
-        if(data.section !== "body") return;
-
-        if(data.column.index === 2 || data.column.index === 3){
-            data.cell.styles.halign = "center";
-            data.cell.styles.valign = "middle";
-        }
-
+        0: { cellWidth: 34 },
+        1: { cellWidth: 12, halign: "center" },
+        2: { cellWidth: 22, halign: "center" },
+        3: { cellWidth: 48, halign: "center" },
+        4: { cellWidth: "auto" }
     }
 
 });
@@ -1731,7 +1720,7 @@ const data = jurnal.map(j => [
     j.journal_activity
 ]);
 
-ddoc.autoTable({
+doc.autoTable({
     startY: 90,
 
     head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
@@ -1746,29 +1735,18 @@ ddoc.autoTable({
     },
 
     headStyles: {
-        fillColor: [30,64,175],
+        fillColor: [30, 64, 175],
         textColor: [255,255,255],
         halign: "center",
         fontStyle: "bold"
     },
 
     columnStyles: {
-        0:{ cellWidth:34 },
-        1:{ cellWidth:12, halign:"center" },
-        2:{ cellWidth:22, halign:"center", valign:"middle" },
-        3:{ cellWidth:48, halign:"center", valign:"middle" },
-        4:{ cellWidth:"auto" }
-    }, // <-- koma di sini WAJIB
-
-    didParseCell: function(data){
-
-        if(data.section !== "body") return;
-
-        if(data.column.index === 2 || data.column.index === 3){
-            data.cell.styles.halign = "center";
-            data.cell.styles.valign = "middle";
-        }
-
+        0: { cellWidth: 34 },
+        1: { cellWidth: 12, halign: "center" },
+        2: { cellWidth: 22, halign: "center" },
+        3: { cellWidth: 48, halign: "center" },
+        4: { cellWidth: "auto" }
     }
 
 });
