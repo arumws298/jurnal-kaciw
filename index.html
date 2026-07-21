@@ -1473,7 +1473,7 @@ function addSignatures(doc, y) {
     // ==========================
     // GURU MAPEL
     // ==========================
-    doc.setFont("helvetica", "normal");
+    doc.setFont("helvetica", "bold");
     doc.text(`Tangerang, ${formatDateSignature(new Date())}`, rightX, y,
     { align: "left" }
 );
@@ -1654,7 +1654,7 @@ doc.setFont("helvetica","normal");
 doc.setFontSize(12);
 
 // turun sekitar 8 mm (±2 spasi)
-doc.text(`Periode : ${periodeText}`,105,71,{align:"center"});
+   doc.text(`Periode : ${periode}`,105,71,{align:"center"});
     
 // ======================
 // IDENTITAS
@@ -1988,7 +1988,7 @@ const finalY = doc.lastAutoTable.finalY;
 // ======================
 
 drawAttendanceLegend(doc, finalY+10);
-addSignatures(doc, finalY + 65);
+addSignatures(doc, finalY + 45);
 
 // ======================
 // SIMPAN PDF
