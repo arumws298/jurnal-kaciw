@@ -1473,7 +1473,7 @@ function addSignatures(doc, y) {
     // ==========================
     // GURU MAPEL
     // ==========================
-    doc.setFont("helvetica", "bold");
+    doc.setFont("helvetica", "normal");
     doc.text(`Tangerang, ${formatDateSignature(new Date())}`, rightX, y,
     { align: "left" }
 );
@@ -1481,7 +1481,9 @@ function addSignatures(doc, y) {
     { align: "left" }
 );
     // Ruang tanda tangan ±30 mm
-   doc.text(CONFIG.teacher_name, rightX, y + 40, { align: "left" });
+  doc.setFont("helvetica", "bold");
+  doc.text(CONFIG.teacher_name, rightX, y + 40, { align: "left" });
+  doc.setFont("helvetica", "normal");
   doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 46, { align: "left" });
 }
 //-----DOWNLOAD PRESENSI PDF FULL-----
@@ -1988,7 +1990,7 @@ const finalY = doc.lastAutoTable.finalY;
 // ======================
 
 drawAttendanceLegend(doc, finalY+10);
-addSignatures(doc, finalY + 20);
+addSignatures(doc, finalY + 40);
 
 // ======================
 // SIMPAN PDF
