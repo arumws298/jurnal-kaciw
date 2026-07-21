@@ -1465,10 +1465,10 @@ function addSignatures(doc, y) {
 
     // Ruang tanda tangan ±30 mm
     doc.setFont("helvetica", "bold");
-    doc.text(CONFIG.principal_name, leftX, y + 60);
+    doc.text(CONFIG.principal_name, leftX, y + 40);
 
     doc.setFont("helvetica", "normal");
-    doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 66);
+    doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 46);
 
     // ==========================
     // GURU MAPEL
@@ -1481,8 +1481,8 @@ function addSignatures(doc, y) {
     { align: "left" }
 );
     // Ruang tanda tangan ±30 mm
-   doc.text(CONFIG.teacher_name, rightX, y + 60, { align: "left" });
-  doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 66, { align: "left" });
+   doc.text(CONFIG.teacher_name, rightX, y + 40, { align: "left" });
+  doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 46, { align: "left" });
 }
 //-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
@@ -1533,20 +1533,38 @@ async function downloadJurnalPDF() {
       const doc = new jsPDF();
     doc.addImage(KOP_IMAGE,'PNG',10,5,190,42);
 // Judul di bawah kop
+doc.setFont("helvetica","bold");
 doc.setFontSize(16);
-doc.setFont(undefined, 'bold');
-doc.text("JURNAL MENGAJAR GURU", 105, 54, { align: 'center' });
+doc.text("JURNAL MENGAJAR GURU",105,54,{align:"center"});
 
-// Nama guru di bawah judul
-doc.setFontSize(12);
-doc.setFont(undefined, 'normal');
-doc.text("Nama",14,69);
-doc.text(":",50,69);
-doc.text(CONFIG.teacher_name,54,69);
+// ======================
+// IDENTITAS
+// ======================
 
-doc.text("Mata Pelajaran",14,75);
-doc.text(":",50,75);
-doc.text(CONFIG.subject_name,54,75);
+const labelX = 14;
+const colonX = 50;
+const valueX = 54;
+const startY = 76;
+const rowGap = 8;
+
+doc.setFont("helvetica", "normal");
+doc.setFontSize(11);
+
+// Kelas
+doc.text("Kelas", labelX, startY);
+doc.text(":", colonX, startY);
+doc.text(kelas || "Semua Kelas", valueX, startY);
+
+// Nama
+doc.text("Nama", labelX, startY + rowGap);
+doc.text(":", colonX, startY + rowGap);
+doc.text(CONFIG.teacher_name, valueX, startY + rowGap);
+
+// Mata Pelajaran
+doc.text("Mata Pelajaran", labelX, startY + rowGap * 2);
+doc.text(":", colonX, startY + rowGap * 2);
+doc.text(CONFIG.subject_name, valueX, startY + rowGap * 2);
+  
 // Urutkan jurnal berdasarkan tanggal lalu jam
 allData.journals.sort((a, b) => {
 
@@ -1568,11 +1586,46 @@ const data = allData.journals.map(j => [
     j.journal_activity
 ]);
 
-      doc.autoTable({
-        startY: 90, head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
-        body: data, theme: 'grid', headStyles: {fillColor: [30, 64, 175]}
-      });
+     doc.autoTable({
+    startY: 90,
 
+    head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
+
+    body: data,
+
+    theme: 'grid',
+
+    styles: {
+        fontSize: 10,
+        valign: "middle"
+    },
+
+    headStyles: {
+        fillColor: [30, 64, 175],
+        textColor: [255,255,255],
+        halign: "center",
+        fontStyle: "bold"
+    },
+
+    columnStyles: {
+        0: { cellWidth: 34 },                               // Tanggal
+        1: { cellWidth: 12, halign: "center" },             // Jam
+        2: { cellWidth: 22, halign: "center", valign: "middle" }, // Kelas
+        3: { cellWidth: 48, halign: "center", valign: "middle" }, // Topik
+        4: { cellWidth: "auto", valign: "middle" }          // Aktivitas
+    },
+
+    didParseCell: function(data){
+
+        if(data.section !== "body") return;
+
+        if(data.column.index === 2 || data.column.index === 3){
+            data.cell.styles.halign = "center";
+            data.cell.styles.valign = "middle";
+        }
+
+    }
+});
       const finalY = doc.lastAutoTable.finalY + 20;
       if(finalY < 200) addSignatures(doc, finalY);
       else { doc.addPage(); addSignatures(doc, 20); }
@@ -1603,27 +1656,44 @@ const data = allData.journals.map(j => [
   const [tahun, bln] = bulan.split("-");
   const periode = `${namaBulan[parseInt(bln)-1]} ${tahun}`;
 
+doc.setFont("helvetica","bold");
 doc.setFontSize(16);
-doc.setFont(undefined,'bold');
-doc.text("JURNAL MENGAJAR GURU",105,54,{align:'center'});
+doc.text("JURNAL MENGAJAR GURU",105,54,{align:"center"});
 
+doc.setFont("helvetica","normal");
+doc.setFontSize(12);
+
+// turun sekitar 8 mm (±2 spasi)
+doc.text(`Periode : ${periodeText}`,105,71,{align:"center"});
+    
+// ======================
+// IDENTITAS
+// ======================
+
+const labelX = 14;
+const colonX = 50;
+const valueX = 54;
+
+const startY = 76;
+const rowGap = 8;
+
+doc.setFont("helvetica", "normal");
 doc.setFontSize(11);
-doc.setFont(undefined,'normal');
-doc.text(`Periode : ${periode}`,105,61,{align:'center'});
-    
-//FORMAT PENULISAN
-doc.text("Kelas",14,71);
-doc.text(":",50,69);
-doc.text(kelas || "Semua Kelas",54,69);
 
-doc.text("Nama",14,77);
-doc.text(":",50,75);
-doc.text(CONFIG.teacher_name,54,75);
+// Kelas
+doc.text("Kelas", labelX, startY);
+doc.text(":", colonX, startY);
+doc.text(kelas || "Semua Kelas", valueX, startY);
 
-doc.text("Mata Pelajaran",14,83);
-doc.text(":",50,81);
-doc.text(CONFIG.subject_name,54,81);
-    
+// Nama
+doc.text("Nama", labelX, startY + rowGap);
+doc.text(":", colonX, startY + rowGap);
+doc.text(CONFIG.teacher_name, valueX, startY + rowGap);
+
+// Mata Pelajaran
+doc.text("Mata Pelajaran", labelX, startY + rowGap * 2);
+doc.text(":", colonX, startY + rowGap * 2);
+doc.text(CONFIG.subject_name, valueX, startY + rowGap * 2);
 const jurnal = allData.journals.filter(j => {
     const cocokBulan = j.journal_date.startsWith(bulan);
     const cocokKelas = kelas ? j.journal_class === kelas : true;
@@ -1660,13 +1730,45 @@ const data = jurnal.map(j => [
     j.journal_activity
 ]);
 
-  doc.autoTable({
-      startY:92,
-      head:[['Tanggal','Jam','Kelas','Topik','Aktivitas']],
-      body:data,
-      theme:'grid',
-      headStyles:{fillColor:[30,64,175]}
-  });
+doc.autoTable({
+    startY: 92,
+
+    head: [['Tanggal','Jam','Kelas','Topik','Aktivitas']],
+
+    body: data,
+
+    theme: 'grid',
+
+    styles: {
+        fontSize: 10,
+        valign: "middle"
+    },
+
+    headStyles: {
+        fillColor: [30,64,175],
+        textColor: [255,255,255],
+        halign: "center",
+        fontStyle: "bold"
+    },
+
+    columnStyles: {
+        0: { cellWidth: 34 },                                // Tanggal
+        1: { cellWidth: 12, halign: "center" },              // Jam
+        2: { cellWidth: 22, halign: "center" },              // Kelas
+        3: { cellWidth: 48, halign: "center" },              // Topik
+        4: { cellWidth: "auto" }                             // Aktivitas
+    }
+
+      didParseCell: function(data){
+
+    if(data.section !== "body") return;
+
+    if(data.column.index === 2 || data.column.index === 3){
+        data.cell.styles.halign = "center";
+        data.cell.styles.valign = "middle";
+    }
+}
+}); 
 
   const finalY = doc.lastAutoTable.finalY + 20;
 
@@ -1772,14 +1874,7 @@ const pageWidth = doc.internal.pageSize.getWidth();
 
 // gambar kop
 if (KOP_IMAGE) {
-    doc.addImage(
-        KOP_IMAGE,
-        "PNG",
-        10,          // margin kiri
-        8,           // posisi atas
-        pageWidth-20,// otomatis pas kiri-kanan
-        20           // tinggi kop
-    );
+      doc.addImage(KOP_IMAGE, 'PNG', 10, 5, 190, 42);
 }
 
 // ubah periode menjadi Juli 2026
@@ -1800,11 +1895,9 @@ doc.setFontSize(16);
 
 doc.text(
     "REKAP PRESENSI BULANAN",
-    pageWidth / 2,
-    40,
-    {
-        align: "center"
-    }
+    105,
+    54,
+    { align: "center" }
 );
 
 // ======================
@@ -1814,8 +1907,20 @@ doc.text(
 doc.setFont("helvetica","normal");
 doc.setFontSize(11);
 
-doc.text(`Kelas : ${kelas}`,14,50);
-doc.text(`Periode : ${periodeText}`,14,57);
+const labelX = 14;
+const colonX = 34;
+const valueX = 38;
+
+doc.setFont("helvetica","normal");
+doc.setFontSize(11);
+
+doc.text("Kelas", labelX, 66);
+doc.text(":", colonX, 66);
+doc.text(kelas, valueX, 66);
+
+doc.text("Periode", labelX, 73);
+doc.text(":", colonX, 73);
+doc.text(periodeText, valueX, 73);
 
 // ======================
 // TABEL
@@ -1823,7 +1928,7 @@ doc.text(`Periode : ${periodeText}`,14,57);
 
 doc.autoTable({
 
-    startY:66,
+    startY:82,
 
     head:[head],
 
@@ -1904,7 +2009,7 @@ const finalY = doc.lastAutoTable.finalY;
 // ======================
 
 drawAttendanceLegend(doc, finalY+10);
-addSignatures(doc, finalY + 45);
+addSignatures(doc, finalY + 65);
 
 // ======================
 // SIMPAN PDF
