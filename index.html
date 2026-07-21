@@ -1452,42 +1452,37 @@ function addSignatures(doc, y) {
 
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    const leftX = 20;
-    const rightX = pageWidth - 75; // posisi awal blok kanan
-
+    const leftX = 15;
+    const rightX = 130;
     doc.setFontSize(10);
 
     // ==========================
     // KEPALA SEKOLAH
     // ==========================
-
-    doc.setFont(undefined, "normal");
+    doc.setFont("helvetica", "normal");
     doc.text("Mengetahui,", leftX, y);
-    doc.text("Kepala Sekolah", leftX, y + 5);
+    doc.text("Kepala Sekolah", leftX, y + 6);
 
-    doc.setFont(undefined, "bold");
-    doc.text(CONFIG.principal_name, leftX, y + 30);
+    // Ruang tanda tangan ±30 mm
+    doc.setFont("helvetica", "bold");
+    doc.text(CONFIG.principal_name, leftX, y + 40);
 
-    doc.setFont(undefined, "normal");
-    doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 35);
+    doc.setFont("helvetica", "normal");
+    doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 46);
 
     // ==========================
     // GURU MAPEL
     // ==========================
-
-    doc.setFont(undefined, "normal");
-    
-doc.text(
-    `Tangerang, ${formatDateSignature(new Date())}\nGuru Mata Pelajaran`,
-    rightX,
-    y
+    doc.setFont("helvetica", "normal");
+    doc.text(`Tangerang, ${formatDateSignature(new Date())}`, rightX, y,
+    { align: "left" }
 );
-
-doc.setFont("helvetica", "bold");
-doc.text(CONFIG.teacher_name, rightX, y + 30);
-
-doc.setFont("helvetica", "normal");
-doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 35);
+  doc.text("Guru Mata Pelajaran",rightX,y + 6,
+    { align: "left" }
+);
+    // Ruang tanda tangan ±30 mm
+   doc.text(CONFIG.teacher_name, rightX, y + 40, { align: "left" });
+  doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 46, { align: "left" });
 }
 //-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
@@ -1872,9 +1867,8 @@ const finalY = doc.lastAutoTable.finalY + 8;
 // TANDA TANGAN
 // ======================
 
-drawAttendanceLegend(doc, finalY + 10);
-
-addSignatures(doc, finalY + 20);
+drawAttendanceLegend(doc, finalY);
+addSignatures(doc, finalY + 15);
 
 // ======================
 // SIMPAN PDF
