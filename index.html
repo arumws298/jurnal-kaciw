@@ -1537,7 +1537,7 @@ async function downloadJurnalPDF() {
 // Judul di bawah kop
 doc.setFont("helvetica","bold");
 doc.setFontSize(16);
-doc.text("JURNAL MENGAJAR GURU",105,54,{align:"center"});
+doc.text("JURNAL MENGAJAR GURU",105,56,{align:"center"});
 
 // ======================
 // IDENTITAS
@@ -1546,23 +1546,18 @@ doc.text("JURNAL MENGAJAR GURU",105,54,{align:"center"});
 const labelX = 14;
 const colonX = 50;
 const valueX = 54;
-const startY = 76;
+
+const startY = 72;
 const rowGap = 8;
 
-doc.setFont("helvetica", "normal");
-doc.setFontSize(11);
-
-// Kelas
 doc.text("Kelas", labelX, startY);
 doc.text(":", colonX, startY);
 doc.text(kelas || "Semua Kelas", valueX, startY);
 
-// Nama
 doc.text("Nama", labelX, startY + rowGap);
 doc.text(":", colonX, startY + rowGap);
 doc.text(CONFIG.teacher_name, valueX, startY + rowGap);
 
-// Mata Pelajaran
 doc.text("Mata Pelajaran", labelX, startY + rowGap * 2);
 doc.text(":", colonX, startY + rowGap * 2);
 doc.text(CONFIG.subject_name, valueX, startY + rowGap * 2);
@@ -1589,7 +1584,7 @@ const data = allData.journals.map(j => [
 ]);
 
 doc.autoTable({
-    startY: 90,
+    startY: 102,
 
     head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
 
@@ -1654,10 +1649,8 @@ doc.text("JURNAL MENGAJAR GURU",105,54,{align:"center"});
 
 doc.setFont("helvetica","normal");
 doc.setFontSize(12);
+doc.text(`Periode : ${periode}`,105,61,{align:"center"});
 
-// turun sekitar 8 mm (±2 spasi)
-   doc.text(`Periode : ${periode}`,105,71,{align:"center"});
-    
 // ======================
 // IDENTITAS
 // ======================
@@ -1666,8 +1659,8 @@ const labelX = 14;
 const colonX = 50;
 const valueX = 54;
 
-const startY = 76;
-const rowGap = 8;
+const startY = 69;
+const rowGap = 7;
 
 doc.setFont("helvetica", "normal");
 doc.setFontSize(11);
@@ -1686,6 +1679,7 @@ doc.text(CONFIG.teacher_name, valueX, startY + rowGap);
 doc.text("Mata Pelajaran", labelX, startY + rowGap * 2);
 doc.text(":", colonX, startY + rowGap * 2);
 doc.text(CONFIG.subject_name, valueX, startY + rowGap * 2);
+    
 const jurnal = allData.journals.filter(j => {
     const cocokBulan = j.journal_date.startsWith(bulan);
     const cocokKelas = kelas ? j.journal_class === kelas : true;
@@ -1873,12 +1867,7 @@ const periodeText = new Date(periode + "-01").toLocaleDateString(
 
 doc.setFont("helvetica","bold");
 doc.setFontSize(16);
-
-doc.text(
-    "REKAP PRESENSI BULANAN",
-    105,
-    54,
-    { align: "center" }
+doc.text("REKAP KEHADIRAN PEMBELAJARAN",105,56,{ align: "center" }
 );
 
 // ======================
