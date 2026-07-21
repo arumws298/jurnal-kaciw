@@ -1465,10 +1465,10 @@ function addSignatures(doc, y) {
 
     // Ruang tanda tangan ±30 mm
     doc.setFont("helvetica", "bold");
-    doc.text(CONFIG.principal_name, leftX, y + 40);
+    doc.text(CONFIG.principal_name, leftX, y + 50);
 
     doc.setFont("helvetica", "normal");
-    doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 46);
+    doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 56);
 
     // ==========================
     // GURU MAPEL
@@ -1481,8 +1481,8 @@ function addSignatures(doc, y) {
     { align: "left" }
 );
     // Ruang tanda tangan ±30 mm
-   doc.text(CONFIG.teacher_name, rightX, y + 40, { align: "left" });
-  doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 46, { align: "left" });
+   doc.text(CONFIG.teacher_name, rightX, y + 50, { align: "left" });
+  doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 56, { align: "left" });
 }
 //-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
@@ -1769,17 +1769,25 @@ async function downloadPresensiMonthlyPDF() {
 // ======================
 
 if (KOP_IMAGE) {
-    doc.addImage(KOP_IMAGE, "PNG", 10, 8, 190, 20);
+    doc.addImage(KOP_IMAGE, "PNG", 12, 8, 186, 20);
 }
+
+const pageWidth = doc.internal.pageSize.getWidth();
 
 doc.setFont("helvetica","bold");
 doc.setFontSize(14);
-doc.text("REKAP PRESENSI BULANAN",148,40,{align:"center"});
+doc.text("REKAP PRESENSI BULANAN",pageWidth / 2,40,{ align: "center" }
+);
 
 doc.setFontSize(10);
 doc.setFont("helvetica","normal");
 doc.text(`Kelas : ${kelas}`,14,48);
-doc.text(`Periode : ${periode}`,14,54);
+const periodeText = new Date(periode + "-01").toLocaleDateString("id-ID", {
+    month: "long",
+    year: "numeric"
+});
+
+doc.text(`Periode : ${periodeText}`, 14, 54);
 
 // ======================
 // TABEL
