@@ -1465,10 +1465,10 @@ function addSignatures(doc, y) {
 
     // Ruang tanda tangan ±30 mm
     doc.setFont("helvetica", "bold");
-    doc.text(CONFIG.principal_name, leftX, y + 50);
+    doc.text(CONFIG.principal_name, leftX, y + 60);
 
     doc.setFont("helvetica", "normal");
-    doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 56);
+    doc.text(`NIP. ${CONFIG.principal_nip}`, leftX, y + 66);
 
     // ==========================
     // GURU MAPEL
@@ -1481,8 +1481,8 @@ function addSignatures(doc, y) {
     { align: "left" }
 );
     // Ruang tanda tangan ±30 mm
-   doc.text(CONFIG.teacher_name, rightX, y + 50, { align: "left" });
-  doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 56, { align: "left" });
+   doc.text(CONFIG.teacher_name, rightX, y + 60, { align: "left" });
+  doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 66, { align: "left" });
 }
 //-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
@@ -1768,26 +1768,54 @@ async function downloadPresensiMonthlyPDF() {
 // KOP SEKOLAH
 // ======================
 
-if (KOP_IMAGE) {
-    doc.addImage(KOP_IMAGE, "PNG", 12, 8, 186, 20);
-}
-
 const pageWidth = doc.internal.pageSize.getWidth();
 
-doc.setFont("helvetica","bold");
-doc.setFontSize(14);
-doc.text("REKAP PRESENSI BULANAN",pageWidth / 2,40,{ align: "center" }
+// gambar kop
+if (KOP_IMAGE) {
+    doc.addImage(
+        KOP_IMAGE,
+        "PNG",
+        10,          // margin kiri
+        8,           // posisi atas
+        pageWidth-20,// otomatis pas kiri-kanan
+        20           // tinggi kop
+    );
+}
+
+// ubah periode menjadi Juli 2026
+const periodeText = new Date(periode + "-01").toLocaleDateString(
+    "id-ID",
+    {
+        month: "long",
+        year: "numeric"
+    }
 );
 
-doc.setFontSize(10);
-doc.setFont("helvetica","normal");
-doc.text(`Kelas : ${kelas}`,14,48);
-const periodeText = new Date(periode + "-01").toLocaleDateString("id-ID", {
-    month: "long",
-    year: "numeric"
-});
+// ======================
+// JUDUL
+// ======================
 
-doc.text(`Periode : ${periodeText}`, 14, 54);
+doc.setFont("helvetica","bold");
+doc.setFontSize(16);
+
+doc.text(
+    "REKAP PRESENSI BULANAN",
+    pageWidth / 2,
+    40,
+    {
+        align: "center"
+    }
+);
+
+// ======================
+// IDENTITAS
+// ======================
+
+doc.setFont("helvetica","normal");
+doc.setFontSize(11);
+
+doc.text(`Kelas : ${kelas}`,14,50);
+doc.text(`Periode : ${periodeText}`,14,57);
 
 // ======================
 // TABEL
@@ -1795,7 +1823,7 @@ doc.text(`Periode : ${periodeText}`, 14, 54);
 
 doc.autoTable({
 
-    startY:60,
+    startY:66,
 
     head:[head],
 
@@ -1869,14 +1897,14 @@ doc.autoTable({
 // LEGEND WARNA
 // ======================
 
-const finalY = doc.lastAutoTable.finalY + 8;
+const finalY = doc.lastAutoTable.finalY;
 
 // ======================
 // TANDA TANGAN
 // ======================
 
-drawAttendanceLegend(doc, finalY);
-addSignatures(doc, finalY + 15);
+drawAttendanceLegend(doc, finalY+10);
+addSignatures(doc, finalY + 45);
 
 // ======================
 // SIMPAN PDF
