@@ -1484,10 +1484,10 @@ doc.text(
 );
 
 doc.setFont("helvetica", "bold");
-doc.text(GURU_NAMA, rightX, y + 30);
+doc.text(CONFIG.teacher_name, rightX, y + 30);
 
 doc.setFont("helvetica", "normal");
-doc.text(`NIP. ${GURU_NIP}`, rightX, y + 35);
+doc.text(`NIP. ${CONFIG.teacher_nip}`, rightX, y + 35);
 }
 //-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
