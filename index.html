@@ -1476,8 +1476,7 @@ function addSignatures(doc, y) {
     // ==========================
 
     doc.setFont(undefined, "normal");
-    const rightX = pageWidth - 75; // sesuaikan jika perlu
-
+    
 doc.text(
     `Tangerang, ${formatDateSignature(new Date())}\nGuru Mata Pelajaran`,
     rightX,
@@ -1485,10 +1484,10 @@ doc.text(
 );
 
 doc.setFont("helvetica", "bold");
-doc.text(GURU_NAMA, rightX, y + 45);
+doc.text(GURU_NAMA, rightX, y + 30);
 
 doc.setFont("helvetica", "normal");
-doc.text(`NIP. ${GURU_NIP}`, rightX, y + 52);
+doc.text(`NIP. ${GURU_NIP}`, rightX, y + 35);
 }
 //-----DOWNLOAD PRESENSI PDF FULL-----
     async function downloadPresensiPDF() {
