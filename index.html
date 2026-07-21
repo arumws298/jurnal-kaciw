@@ -1547,14 +1547,23 @@ const labelX = 14;
 const colonX = 50;
 const valueX = 54;
 
-const startY = 76;
+const startY = 72;
 const rowGap = 8;
+
 doc.setFont("helvetica","normal");
-doc.setFontSize(12);
+doc.setFontSize(11);
+
+// Kelas
+doc.text("Kelas", labelX, startY);
+doc.text(":", colonX, startY);
+doc.text("Semua Kelas", valueX, startY);
+
+// Nama
 doc.text("Nama", labelX, startY + rowGap);
 doc.text(":", colonX, startY + rowGap);
 doc.text(CONFIG.teacher_name, valueX, startY + rowGap);
 
+// Mata Pelajaran
 doc.text("Mata Pelajaran", labelX, startY + rowGap * 2);
 doc.text(":", colonX, startY + rowGap * 2);
 doc.text(CONFIG.subject_name, valueX, startY + rowGap * 2);
@@ -1581,7 +1590,7 @@ const data = allData.journals.map(j => [
 ]);
 
 doc.autoTable({
-    startY: 106,
+    startY: 100,
 
     head: [['Tanggal', 'Jam', 'Kelas', 'Topik', 'Aktivitas']],
 
