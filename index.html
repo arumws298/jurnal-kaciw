@@ -1537,7 +1537,7 @@ async function downloadJurnalPDF() {
 // Judul di bawah kop
 doc.setFont("helvetica","bold");
 doc.setFontSize(16);
-doc.text("JURNAL MENGAJAR GURU",105,56,{align:"center"});
+doc.text("JURNAL MENGAJAR GURU",105,60,{align:"center"});
 
 // ======================
 // IDENTITAS
@@ -1547,7 +1547,7 @@ const labelX = 14;
 const colonX = 50;
 const valueX = 54;
 
-const startY = 72;
+const startY = 76;
 const rowGap = 8;
 
 doc.text("Kelas", labelX, startY);
@@ -1645,11 +1645,11 @@ doc.autoTable({
 
 doc.setFont("helvetica","bold");
 doc.setFontSize(16);
-doc.text("JURNAL MENGAJAR GURU",105,54,{align:"center"});
+doc.text("JURNAL MENGAJAR GURU",105,60,{align:"center"});
 
 doc.setFont("helvetica","normal");
 doc.setFontSize(12);
-doc.text(`Periode : ${periode}`,105,61,{align:"center"});
+doc.text(`Periode : ${periode}`,105,66,{align:"center"});
 
 // ======================
 // IDENTITAS
@@ -1659,12 +1659,11 @@ const labelX = 14;
 const colonX = 50;
 const valueX = 54;
 
-const startY = 69;
-const rowGap = 7;
+const startY = 76;
+const rowGap = 8;
 
 doc.setFont("helvetica", "normal");
 doc.setFontSize(11);
-
 // Kelas
 doc.text("Kelas", labelX, startY);
 doc.text(":", colonX, startY);
