@@ -60,6 +60,70 @@
     
     .btn-delete { transition: transform 0.2s ease; }
     .btn-delete:hover { transform: scale(1.2); }
+
+    /*Dark Mode*/
+
+body.dark{
+    background:#0f172a !important;
+    color:#f8fafc;
+    transition:.3s;
+}
+
+body.dark .glass-effect{
+    background:#0f172a;
+}
+
+body.dark .card-glass{
+    background:#1e293b;
+    color:#f8fafc;
+    border-color:#334155;
+}
+
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark label,
+body.dark p,
+body.dark span,
+body.dark td,
+body.dark th{
+    color:#f8fafc !important;
+}
+
+body.dark input,
+body.dark select,
+body.dark textarea{
+    background:#0f172a;
+    color:white;
+    border-color:#475569;
+}
+
+body.dark table{
+    color:white;
+}
+
+body.dark tbody tr:hover{
+    background:#334155;
+}
+
+body.dark .bg-white{
+    background:#1e293b !important;
+}
+
+body.dark .bg-blue-50,
+body.dark .bg-gray-50,
+body.dark .bg-green-100,
+body.dark .bg-yellow-100,
+body.dark .bg-red-100,
+body.dark .bg-purple-100{
+    background:#334155 !important;
+}
+
+body.dark .text-gray-600,
+body.dark .text-gray-700,
+body.dark .text-gray-500{
+    color:#cbd5e1 !important;
+}
   </style>
 </head>
 <body class="h-full" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);">
@@ -105,18 +169,39 @@
       <header class="glass-effect text-white py-4 px-4 sticky top-0 z-40 shadow-lg">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-white shadow-md">
-              <img src="https://iili.io/fv13nAG.png" alt="Logo KACIW" class="w-full h-full object-cover">
-            </div>
-            <div>
-              <h1 class="text-lg md:text-xl font-bold">Jurnal Matematika KACIW</h1>
-              <p class="text-xs text-blue-100" id="header-school-name">SMKN 9 Kabupaten Tangerang</p>
-            </div>
-          </div>
-          <button id="btn-logout" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
-            <span>Keluar</span>
-          </button>
+           <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-white shadow-md">
+            <img src="https://iili.io/fv13nAG.png" alt="Logo KACIW" class="w-full h-full object-cover">
         </div>
+
+        <div>
+            <h1 class="text-lg md:text-xl font-bold">
+                Jurnal Matematika KACIW
+            </h1>
+            <p class="text-xs text-blue-100" id="header-school-name">
+                SMKN 9 Kabupaten Tangerang
+            </p>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+
+        <button id="btn-theme"
+            class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-xl transition-all text-lg"
+            title="Dark Mode">
+            🌙
+        </button>
+
+        <button id="btn-logout"
+            class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+            <span>Keluar</span>
+        </button>
+
+    </div>
+
+</div>
       </header>
 
       <!-- MENU UTAMA -->
@@ -126,6 +211,68 @@
           <p class="text-lg text-blue-100 font-bold" id="dashboard-teacher-name">Arum Widya Safitri, S.Pd</p>
           <p class="text-blue-100">Guru Mata Pelajaran <span id="dashboard-subject">Matematika</span></p>
         </div>
+        <!-- Dashboard Statistik -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+
+    <div class="card-glass rounded-2xl p-5 text-center shadow-lg">
+        <div class="text-4xl mb-2">🎓</div>
+        <div id="dashboard-total-students"
+             class="text-3xl font-extrabold text-blue-700">0</div>
+        <p class="text-gray-600 font-semibold">Total Siswa</p>
+    </div>
+
+    <div class="card-glass rounded-2xl p-5 text-center shadow-lg">
+        <div class="text-4xl mb-2">🏫</div>
+        <div id="dashboard-total-classes"
+             class="text-3xl font-extrabold text-indigo-700">0</div>
+        <p class="text-gray-600 font-semibold">Total Kelas</p>
+    </div>
+
+    <div class="card-glass rounded-2xl p-5 text-center shadow-lg">
+        <div class="text-4xl mb-2">📚</div>
+        <div id="dashboard-total-journals"
+             class="text-3xl font-extrabold text-amber-600">0</div>
+        <p class="text-gray-600 font-semibold">Total Jurnal</p>
+    </div>
+
+    <div class="card-glass rounded-2xl p-5 text-center shadow-lg">
+        <div class="text-4xl mb-2">📅</div>
+        <div id="dashboard-hadir"
+             class="text-3xl font-extrabold text-green-600">0</div>
+        <p class="text-gray-600 font-semibold">Hadir Hari Ini</p>
+    </div>
+
+</div>
+
+<div class="card-glass rounded-2xl p-6 shadow-lg mb-8">
+
+    <h3 class="text-xl font-bold text-blue-900 mb-4">
+        Ringkasan Presensi Hari Ini
+    </h3>
+
+    <div class="grid grid-cols-3 gap-4">
+
+        <div class="bg-blue-50 rounded-xl p-4 text-center">
+            <div id="dashboard-izin"
+                 class="text-2xl font-bold text-blue-700">0</div>
+            <p>Izin</p>
+        </div>
+
+        <div class="bg-yellow-50 rounded-xl p-4 text-center">
+            <div id="dashboard-sakit"
+                 class="text-2xl font-bold text-yellow-700">0</div>
+            <p>Sakit</p>
+        </div>
+
+        <div class="bg-red-50 rounded-xl p-4 text-center">
+            <div id="dashboard-alfa"
+                 class="text-2xl font-bold text-red-700">0</div>
+            <p>Alpa</p>
+        </div>
+
+    </div>
+
+</div>
 
         <!-- TAMPILAN MENU KARTU -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -530,25 +677,73 @@ async function loadJournalsFromSupabase() {
     // --- INISIALISASI ---
   async function initApp() {
 
-  // Ambil gambar kop
-  await loadKopImage();
+    try {
 
-  // Ambil semua data dari Supabase
-  await loadStudentsFromSupabase();
-  await loadAttendanceFromSupabase();
-  await loadJournalsFromSupabase();
+        // Ambil gambar kop
+        await loadKopImage();
 
-  // Isi informasi aplikasi
-  document.getElementById('login-school-name').textContent = CONFIG.school_name;
-  document.getElementById('header-school-name').textContent = CONFIG.school_name;
-  document.getElementById('dashboard-teacher-name').textContent = CONFIG.teacher_name;
-  document.getElementById('dashboard-subject').textContent = CONFIG.subject_name;
+        // Ambil semua data secara bersamaan
+        await Promise.all([
+            loadStudentsFromSupabase(),
+            loadAttendanceFromSupabase(),
+            loadJournalsFromSupabase()
+        ]);
 
-  // Pasang semua event
-  setupEventListeners();
+        // Isi informasi aplikasi
+        document.getElementById('login-school-name').textContent = CONFIG.school_name;
+        document.getElementById('header-school-name').textContent = CONFIG.school_name;
+        document.getElementById('dashboard-teacher-name').textContent = CONFIG.teacher_name;
+        document.getElementById('dashboard-subject').textContent = CONFIG.subject_name;
 
-  // Isi dropdown kelas
-  updateClassDropdowns();
+        // Event
+        setupEventListeners();
+      // Theme
+      setupTheme();
+        // Dropdown
+        updateClassDropdowns();
+      //Dashboard
+      updateDashboard();
+
+    } catch (err) {
+
+        console.error(err);
+        showToast("Gagal memuat aplikasi.");
+
+    }
+
+}
+
+    //---THEME---//
+    function setupTheme(){
+
+    const btnTheme =
+        document.getElementById("btn-theme");
+
+    const savedTheme =
+        localStorage.getItem("theme") || "light";
+
+    if(savedTheme==="dark"){
+        document.body.classList.add("dark");
+        btnTheme.textContent="☀️";
+    }
+
+    btnTheme.onclick=function(){
+
+        document.body.classList.toggle("dark");
+
+        const dark =
+            document.body.classList.contains("dark");
+
+        localStorage.setItem(
+            "theme",
+            dark ? "dark":"light"
+        );
+
+        btnTheme.textContent =
+            dark ? "☀️":"🌙";
+
+    };
+
 }
     // --- FUNGSI UTAMA PENYIMPANAN ---
     function saveData() {
@@ -803,9 +998,17 @@ function getClasses() {
     // --- LOGIKA MANAJEMEN SISWA ---
     function renderStudents() {
       const filterClass = document.getElementById('filter-student-class').value;
-  let students = allData.students;
-students = students.sort((a, b) =>
-  a.student_name.localeCompare(b.student_name, 'id')
+let students = [...allData.students];
+
+students.sort((a, b) =>
+    a.student_name.localeCompare(
+        b.student_name,
+        "id",
+        {
+            sensitivity: "base",
+            numeric: true
+        }
+    )
 );
 
 if (filterClass)
@@ -845,20 +1048,22 @@ async function addStudent(e) {
 
   try {
 
-    const { error } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from('students')
-      .insert([newStudent]);
+      .insert([newStudent])
+      .select()
+      .single();
 
     if (error) {
       throw error;
     }
 
-    await loadStudentsFromSupabase();
+    // Update cache lokal
+   allData.students.push(data);
 
-    renderStudents();
-    updateClassDropdowns();
+refreshStudentsUI();
 
-    document.getElementById('form-add-student').reset();
+document.getElementById('form-add-student').reset();
     closeModal('modal-add-student');
 
     showToast("Siswa berhasil ditambahkan");
@@ -876,6 +1081,69 @@ async function addStudent(e) {
 let deleteTarget = null;
 let editJournalId = null;
 let editAttendanceId = null;
+
+function refreshStudentsUI() {
+    renderStudents();
+    updateClassDropdowns();
+    updateDashboard();
+}
+
+function refreshAttendanceUI() {
+    renderAttendanceList();
+    renderRekapPresensi();
+    updateDashboard();
+}
+
+function refreshJournalUI() {
+    renderRekapJurnal();
+    updateDashboard();
+}
+    
+function updateDashboard() {
+
+    // Total siswa
+    const totalStudents = allData.students.length;
+
+    // Total kelas unik
+    const totalClasses = new Set(
+        allData.students.map(s => s.student_class)
+    ).size;
+
+    // Total jurnal
+    const totalJournals = allData.journals.length;
+
+    // Presensi hari ini
+    const today = new Date().toISOString().split("T")[0];
+
+    const todayAttendance = allData.attendance.filter(
+        a => a.attendance_date === today
+    );
+
+    const hadir = todayAttendance.filter(
+        a => a.attendance_status === "Hadir"
+    ).length;
+
+    const izin = todayAttendance.filter(
+        a => a.attendance_status === "Izin"
+    ).length;
+
+    const sakit = todayAttendance.filter(
+        a => a.attendance_status === "Sakit"
+    ).length;
+
+    const alfa = todayAttendance.filter(
+        a => a.attendance_status === "Alfa"
+    ).length;
+
+    document.getElementById("dashboard-total-students").textContent = totalStudents;
+    document.getElementById("dashboard-total-classes").textContent = totalClasses;
+    document.getElementById("dashboard-total-journals").textContent = totalJournals;
+    document.getElementById("dashboard-hadir").textContent = hadir;
+    document.getElementById("dashboard-izin").textContent = izin;
+    document.getElementById("dashboard-sakit").textContent = sakit;
+    document.getElementById("dashboard-alfa").textContent = alfa;
+
+}
 
 function confirmDeleteStudent(id) {
   deleteTarget = {
@@ -927,18 +1195,17 @@ async function executeDelete() {
         .delete()
         .eq('id', deleteTarget.id);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      await loadStudentsFromSupabase();
-
-      updateClassDropdowns();
+      // Update cache lokal
+      allData.students = allData.students.filter(
+        s => s.id !== deleteTarget.id
+      );
 
       document.getElementById('filter-student-class').value =
         selectedClass;
 
-      renderStudents();
+      refreshStudentsUI();
 
       showToast("Siswa dihapus");
 
@@ -949,76 +1216,73 @@ async function executeDelete() {
         .delete()
         .eq('student_class', deleteTarget.className);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      await loadStudentsFromSupabase();
+      // Update cache lokal
+      allData.students = allData.students.filter(
+        s => s.student_class !== deleteTarget.className
+      );
 
-      updateClassDropdowns();
-
-      // RESET FILTER
       document.getElementById('filter-student-class').value = '';
 
-      renderStudents();
+      refreshStudentsUI();
 
-      showToast(
-        `Kelas ${deleteTarget.className} berhasil dihapus`
-      );
+      showToast(`Kelas ${deleteTarget.className} berhasil dihapus`);
 
     } else if (deleteTarget.type === 'all_students') {
 
-    const { error } = await supabaseClient
+      const { error } = await supabaseClient
         .from('students')
         .delete()
         .gt('created_at', '1900-01-01');
 
-    if (error) {
-        throw error;
-    }
+      if (error) throw error;
 
-    await loadStudentsFromSupabase();
+      // Kosongkan cache
+      allData.students = [];
 
-    renderStudents();
+      refreshStudentsUI();
 
-    updateClassDropdowns();
+      showToast("Semua siswa berhasil dihapus");
 
-    showToast("Semua siswa berhasil dihapus");
+    } else if (deleteTarget.type === 'journal') {
 
-} else if (deleteTarget.type === 'journal') {
-
-    const { error } = await supabaseClient
+      const { error } = await supabaseClient
         .from('journals')
         .delete()
         .eq('id', deleteTarget.id);
 
-    if (error) {
-        throw error;
+      if (error) throw error;
+
+      // Update cache lokal
+      allData.journals = allData.journals.filter(
+        j => j.id !== deleteTarget.id
+      );
+
+      refreshJournalUI();
+
+      showToast("Jurnal berhasil dihapus");
+
+    } else if (deleteTarget.type === 'attendance') {
+
+      const { error } = await supabaseClient
+        .from('attendance')
+        .delete()
+        .eq('id', deleteTarget.id);
+
+      if (error) throw error;
+
+      // Update cache lokal
+      allData.attendance = allData.attendance.filter(
+        a => a.id !== deleteTarget.id
+      );
+
+      refreshAttendanceUI();
+
+      showToast("Presensi berhasil dihapus");
+
     }
 
-    await loadJournalsFromSupabase();
-
-    renderRekapJurnal();
-
-    showToast("Jurnal berhasil dihapus");
-
-} else if(deleteTarget.type === 'attendance'){
-
-    const { error } = await supabaseClient
-        .from("attendance")
-        .delete()
-        .eq("id", deleteTarget.id);
-
-    if(error) throw error;
-
-    await loadAttendanceFromSupabase();
-
-    renderAttendanceList();
-    renderRekapPresensi();
-
-    showToast("Presensi berhasil dihapus");
-
-}
   } catch (err) {
 
     console.error("Delete Error:", err);
@@ -1078,12 +1342,14 @@ async function deleteAllStudents() {
     }
 
 async function importExcel(e) {
+
   const file = e.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
 
   reader.onload = async function(event) {
+
     const data = new Uint8Array(event.target.result);
 
     const workbook = XLSX.read(data, { type: 'array' });
@@ -1094,34 +1360,38 @@ async function importExcel(e) {
     const studentsToInsert = [];
 
     json.forEach(row => {
+
       if (row['Nama Siswa'] && row['Kelas']) {
+
         studentsToInsert.push({
-          student_name: row['Nama Siswa'],
-          student_class: row['Kelas'],
+          student_name: row['Nama Siswa'].toString().trim(),
+          student_class: row['Kelas'].toString().trim(),
           created_at: new Date().toISOString()
         });
+
       }
+
     });
+
+    if (studentsToInsert.length === 0) {
+      showToast("Tidak ada data yang dapat diimport.");
+      e.target.value = '';
+      return;
+    }
 
     try {
 
-      const { error } = await supabaseClient
+      const { data, error } = await supabaseClient
         .from('students')
-        .insert(studentsToInsert);
+        .insert(studentsToInsert)
+        .select();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log("DATA IMPORT:", studentsToInsert);
-
-      await loadStudentsFromSupabase();
-
-      renderStudents();
-
-      updateClassDropdowns();
-
-      showToast(`${studentsToInsert.length} siswa berhasil diupload!`);
+      // Tambahkan ke cache lokal
+      allData.students.push(...data);
+      refreshStudentsUI();
+      showToast(`${data.length} siswa berhasil diupload!`);
 
     } catch (err) {
 
@@ -1134,25 +1404,11 @@ async function importExcel(e) {
       e.target.value = '';
 
     }
+
   };
 
   reader.readAsArrayBuffer(file);
-}
-  async function deleteClassStudents() {
-  const selectedClass =
-    document.getElementById('filter-student-class').value;
 
-  if (!selectedClass) {
-    showToast("Pilih kelas terlebih dahulu");
-    return;
-  }
-
-  deleteTarget = {
-    type: 'class_students',
-    className: selectedClass
-  };
-
-  openModal('modal-confirm');
 }
     
     // --- LOGIKA PRESENSI ---
@@ -1169,8 +1425,17 @@ function renderAttendanceList() {
         return;
     }
 
-    const students = allData.students.filter(
-        s => s.student_class === classVal
+   const students = allData.students
+    .filter(s => s.student_class === classVal)
+    .sort((a, b) =>
+        a.student_name.localeCompare(
+            b.student_name,
+            "id",
+            {
+                sensitivity: "base",
+                numeric: true
+            }
+        )
     );
 
     if (students.length === 0) {
@@ -1222,23 +1487,35 @@ return `
 `;
     }).join("");
 }
-
+//------PENYIMPANAN PRESENSI-----//
 async function saveAttendance() {
 
+    const btn = document.getElementById("btn-save-attendance");
     const classVal = document.getElementById("select-attendance-class").value;
     const dateVal = document.getElementById("input-attendance-date").value;
-    const selects = document.querySelectorAll(".attendance-status");
+    const selects = [...document.querySelectorAll(".attendance-status")];
+
+    if (!classVal || !dateVal) {
+        showToast("Pilih kelas dan tanggal.");
+        return;
+    }
 
     if (selects.length === 0) {
         showToast("Tidak ada data presensi.");
         return;
     }
 
+    btn.disabled = true;
+    btn.innerHTML = "⏳ Menyimpan...";
+
     try {
 
-        for (const sel of selects) {
+        const insertRows = [];
+        const updatePromises = [];
 
-            const data = {
+        selects.forEach(sel => {
+
+            const row = {
                 student_name: sel.dataset.name,
                 attendance_class: classVal,
                 attendance_date: dateVal,
@@ -1247,46 +1524,60 @@ async function saveAttendance() {
 
             if (sel.dataset.id) {
 
-                const { error } = await supabaseClient
-                    .from("attendance")
-                    .update(data)
-                    .eq("id", sel.dataset.id);
-
-                if (error) {
-                    throw error;
-                }
+                updatePromises.push(
+                    supabaseClient
+                        .from("attendance")
+                        .update(row)
+                        .eq("id", sel.dataset.id)
+                );
 
             } else {
 
-                data.created_at = new Date().toISOString();
-
-                const { error } = await supabaseClient
-                    .from("attendance")
-                    .insert([data]);
-
-                if (error) {
-                    throw error;
-                }
+                row.created_at = new Date().toISOString();
+                insertRows.push(row);
 
             }
+
+        });
+
+        if (insertRows.length > 0) {
+
+            updatePromises.push(
+                supabaseClient
+                    .from("attendance")
+                    .insert(insertRows)
+            );
+
         }
+
+        const results = await Promise.all(updatePromises);
+
+        results.forEach(r => {
+            if (r.error) throw r.error;
+        });
 
         await loadAttendanceFromSupabase();
 
         renderAttendanceList();
         renderRekapPresensi();
 
-        showToast("Presensi berhasil disimpan.");
+        showToast("✅ Presensi berhasil disimpan");
 
     } catch (err) {
 
-        console.error("Save Attendance Error:", err);
+        console.error(err);
 
-        showToast("Gagal menyimpan presensi.");
+        showToast("❌ Gagal menyimpan presensi");
+
+    } finally {
+
+        btn.disabled = false;
+        btn.innerHTML = "💾 Simpan Presensi";
 
     }
-}
 
+}
+//-----HAPUS PRESENSI-----//
 async function deleteAttendance(id) {
 
   if (!confirm("Yakin ingin menghapus presensi siswa ini?")) {
@@ -1608,7 +1899,7 @@ classSelect.innerHTML = classes.map(c => `
 }
 
 //-----FUNGSI UPDATE PRESENSI-----//
-  async function updateAttendance(e){
+ async function updateAttendance(e){
 
     e.preventDefault();
 
@@ -1634,12 +1925,26 @@ classSelect.innerHTML = classes.map(c => `
 
         if(error) throw error;
 
-        await loadAttendanceFromSupabase();
+        // Update cache lokal
+        const index = allData.attendance.findIndex(
+            a => a.id === editAttendanceId
+        );
+
+        if(index !== -1){
+
+            allData.attendance[index] = {
+                ...allData.attendance[index],
+                ...data
+            };
+
+        }
 
         renderAttendanceList();
         renderRekapPresensi();
 
         closeModal("modal-edit-attendance");
+
+        editAttendanceId = null;
 
         showToast("Presensi berhasil diperbarui");
 
