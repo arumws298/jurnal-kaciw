@@ -716,10 +716,23 @@ function openModal(id) {
     document.getElementById(id).classList.remove('hidden');
 }
 
-function closeModal(id) {
-    document.getElementById(id).classList.add('hidden');
-}
+function closeModal(id){
 
+    document.getElementById(id).classList.add("hidden");
+
+    if(id === "modal-add-journal"){
+
+        editJournalId = null;
+
+        document.getElementById("form-add-journal").reset();
+
+        document.querySelector("#form-add-journal button[type='submit']").textContent = "Simpan";
+
+        document.querySelector("#modal-add-journal h3").textContent = "Tambah Jurnal";
+
+    }
+
+}
 function getClasses() {
     const classes = [...new Set(allData.students.map(s => s.student_class))].sort();
     return classes;
@@ -851,6 +864,7 @@ async function addStudent(e) {
 }
 
 let deleteTarget = null;
+let editJournalId = null;
 
 function confirmDeleteStudent(id) {
   deleteTarget = {
@@ -943,24 +957,41 @@ async function executeDelete() {
 
     } else if (deleteTarget.type === 'all_students') {
 
-      const { error } = await supabaseClient
+    const { error } = await supabaseClient
         .from('students')
         .delete()
         .gt('created_at', '1900-01-01');
 
-      if (error) {
+    if (error) {
         throw error;
-      }
-
-      await loadStudentsFromSupabase();
-
-      renderStudents();
-
-      updateClassDropdowns();
-
-      showToast("Semua siswa berhasil dihapus");
     }
 
+    await loadStudentsFromSupabase();
+
+    renderStudents();
+
+    updateClassDropdowns();
+
+    showToast("Semua siswa berhasil dihapus");
+
+} else if (deleteTarget.type === 'journal') {
+
+    const { error } = await supabaseClient
+        .from('journals')
+        .delete()
+        .eq('id', deleteTarget.id);
+
+    if (error) {
+        throw error;
+    }
+
+    await loadJournalsFromSupabase();
+
+    renderRekapJurnal();
+
+    showToast("Jurnal berhasil dihapus");
+
+}
   } catch (err) {
 
     console.error("Delete Error:", err);
@@ -1398,53 +1429,114 @@ if(fMonth)
           <td class="px-4 py-3 text-sm">${j.journal_class}</td>
           <td class="px-4 py-3 font-semibold text-gray-900 text-sm">${j.journal_topic}</td>
           <td class="px-4 py-3 text-gray-600 text-sm truncate max-w-xs">${j.journal_activity}</td>
-          <td class="px-4 py-3 text-center">
-             <button onclick="confirmDeleteJournal('${j.id}')" class="text-red-500 hover:text-red-700 font-bold text-xl">&times;</button>
+          <td class="px-4 py-3 text-center space-x-2">
+          <button onclick="editJournal('${j.id}')"class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">✏️</button>
+          <button onclick="confirmDeleteJournal('${j.id}')"class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">🗑️</button>
           </td>
         </tr>
       `).join('');
     }
 
-  async function addJournal(e) {
+  //-----FUNGSI TAMBAH JURNAL-----//
+async function addJournal(e){
 
-  e.preventDefault();
+    e.preventDefault();
 
-  const newJournal = {
-    journal_date: document.getElementById('input-journal-date').value,
-    journal_time: document.getElementById('input-journal-time').value,
-    journal_class: document.getElementById('input-journal-class').value,
-    journal_topic: document.getElementById('input-journal-topic').value,
-    journal_activity: document.getElementById('input-journal-activity').value,
-    created_at: new Date().toISOString()
-  };
+    const newJournal = {
+        journal_date: document.getElementById("input-journal-date").value,
+        journal_time: document.getElementById("input-journal-time").value,
+        journal_class: document.getElementById("input-journal-class").value,
+        journal_topic: document.getElementById("input-journal-topic").value,
+        journal_activity: document.getElementById("input-journal-activity").value
+    };
 
-  try {
-
-    const { error } = await supabaseClient
-      .from('journals')
-      .insert([newJournal]);
-
-    if (error) {
-      throw error;
+    // hanya saat tambah
+    if(!editJournalId){
+        newJournal.created_at = new Date().toISOString();
     }
 
-    await loadJournalsFromSupabase();
+    try{
 
-    renderRekapJurnal();
+        let error;
 
-    document.getElementById('form-add-journal').reset();
+        if(editJournalId){
 
-    closeModal('modal-add-journal');
+            ({ error } = await supabaseClient
+                .from("journals")
+                .update(newJournal)
+                .eq("id", editJournalId));
 
-    showToast("Jurnal berhasil ditambahkan");
+        }else{
 
-  } catch (err) {
+            ({ error } = await supabaseClient
+                .from("journals")
+                .insert([newJournal]));
 
-    console.error("Add Journal Error:", err);
+        }
 
-    showToast("Gagal menyimpan jurnal.");
+        if(error) throw error;
 
-  }
+        await loadJournalsFromSupabase();
+
+        renderRekapJurnal();
+
+        editJournalId = null;
+
+        document.getElementById("form-add-journal").reset();
+
+        document.querySelector("#form-add-journal button[type='submit']").textContent = "Simpan";
+
+        document.querySelector("#modal-add-journal h3").textContent = "Tambah Jurnal";
+
+        closeModal("modal-add-journal");
+
+        showToast("Jurnal berhasil disimpan");
+
+    }catch(err){
+
+        console.error(err);
+
+        showToast("Gagal menyimpan jurnal");
+
+    }
+
+}
+
+//-----FUNGSI EDIT JURNAL-----//
+function editJournal(id){
+
+    const jurnal = allData.journals.find(j => j.id === id);
+
+    if(!jurnal){
+        showToast("Data tidak ditemukan");
+        return;
+    }
+
+    editJournalId = id;
+
+    document.getElementById("input-journal-date").value = jurnal.journal_date;
+    document.getElementById("input-journal-time").value = jurnal.journal_time;
+    document.getElementById("input-journal-class").value = jurnal.journal_class;
+    document.getElementById("input-journal-topic").value = jurnal.journal_topic;
+    document.getElementById("input-journal-activity").value = jurnal.journal_activity;
+
+    document.querySelector("#modal-add-journal h3").textContent = "Edit Jurnal";
+
+    document.querySelector("#form-add-journal button[type='submit']").textContent = "Update";
+
+    openModal("modal-add-journal");
+
+}
+
+//-----FUNGSI KONFIRMASI HAPUS JURNAL-----//
+function confirmDeleteJournal(id){
+
+    deleteTarget = {
+        type: "journal",
+        id: id
+    };
+
+    openModal("modal-confirm");
 
 }
     // --- PDF GENERATION ---
