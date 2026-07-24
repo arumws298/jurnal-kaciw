@@ -285,6 +285,7 @@
                   <th class="px-4 py-3 text-left text-sm font-bold">Nama Siswa</th>
                   <th class="px-4 py-3 text-left text-sm font-bold">Kelas</th>
                   <th class="px-4 py-3 text-center text-sm font-bold">Status</th>
+                  <th class="px-4 py-3 text-center text-sm font-bold">Aksi</th>
                 </tr>
               </thead>
               <tbody id="rekap-presensi-body"></tbody>
@@ -405,6 +406,8 @@
     <!-- Modal Add Journal -->
     <div id="modal-add-journal" class="fixed inset-0 z-50 hidden"><div class="modal-backdrop absolute inset-0" onclick="closeModal('modal-add-journal')"></div><div class="absolute inset-0 flex items-center justify-center p-4"><div class="card-glass rounded-2xl w-full max-w-md fade-in p-6"><h3 class="text-xl font-bold text-blue-900 mb-4">Tambah Jurnal</h3><form id="form-add-journal" class="space-y-4"><div><label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal</label><input type="date" id="input-journal-date" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Jam Ke-</label><input type="text" id="input-journal-time" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl" placeholder="Contoh: 1-4"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Kelas</label><select id="input-journal-class" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl bg-white"><option value="">Pilih Kelas</option></select></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Topik</label><input type="text" id="input-journal-topic" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl"></div><div><label class="block text-sm font-semibold text-gray-700 mb-1">Aktivitas</label><textarea id="input-journal-activity" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl resize-none"></textarea></div><div class="flex gap-3 pt-2"><button type="button" onclick="closeModal('modal-add-journal')" class="flex-1 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl">Batal</button><button type="submit" class="flex-1 btn-primary text-white font-semibold py-2 rounded-xl">Simpan</button></div></form></div></div></div>
     
+    <!-- Modal Edit Attendance -->
+    <div id="modal-edit-attendance" class="fixed inset-0 z-50 hidden"><div class="modal-backdrop absolute inset-0"onclick="closeModal('modal-edit-attendance')"></div><div class="absolute inset-0 flex items-center justify-center p-4"><div class="card-glass rounded-2xl w-full max-w-md fade-in p-6"><h3 class="text-xl font-bold text-blue-900 mb-4">Edit Presensi</h3><form id="form-edit-attendance" class="space-y-4"><div><label>Tanggal</label><input type="date"id="edit-attendance-date"class="w-full px-4 py-2 border rounded-xl"></div><div><label>Nama</label><input type="text"id="edit-attendance-name" readonly class="w-full px-4 py-2 border rounded-xl bg-gray-100"></div><div><label>Kelas</label><select id="edit-attendance-class"class="w-full px-4 py-2 border rounded-xl"></select></div><div><label>Status</label><select id="edit-attendance-status"class="w-full px-4 py-2 border rounded-xl"><option>Hadir</option><option>Sakit</option><option>Izin</option><option>Dispensasi</option><option>Alpa</option></select></div><div class="flex gap-3"><button type="button"onclick="closeModal('modal-edit-attendance')"class="flex-1 bg-gray-200 py-2 rounded-xl">Batal</button><button type="submit"class="flex-1 btn-primary text-white py-2 rounded-xl">Update </button></div></form></div></div></div>
     <!-- Modal Confirm Delete -->
     <div id="modal-confirm" class="fixed inset-0 z-50 hidden"><div class="modal-backdrop absolute inset-0"></div><div class="absolute inset-0 flex items-center justify-center p-4"><div class="card-glass rounded-2xl w-full max-w-sm fade-in p-6 text-center"><h3 class="text-xl font-bold text-red-700 mb-2">Konfirmasi Hapus</h3><p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus data ini?</p><div class="flex gap-3"><button onclick="closeModal('modal-confirm')" class="flex-1 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl">Batal</button><button id="btn-confirm-delete-action" class="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl">Hapus</button></div></div></div></div>
 
@@ -732,6 +735,13 @@ function closeModal(id){
 
     }
 
+ if(id === "modal-edit-attendance"){
+
+    editAttendanceId = null;
+
+    document.getElementById("form-edit-attendance").reset();
+
+}
 }
 function getClasses() {
     const classes = [...new Set(allData.students.map(s => s.student_class))].sort();
@@ -865,6 +875,7 @@ async function addStudent(e) {
 
 let deleteTarget = null;
 let editJournalId = null;
+let editAttendanceId = null;
 
 function confirmDeleteStudent(id) {
   deleteTarget = {
@@ -990,6 +1001,22 @@ async function executeDelete() {
     renderRekapJurnal();
 
     showToast("Jurnal berhasil dihapus");
+
+} else if(deleteTarget.type === 'attendance'){
+
+    const { error } = await supabaseClient
+        .from("attendance")
+        .delete()
+        .eq("id", deleteTarget.id);
+
+    if(error) throw error;
+
+    await loadAttendanceFromSupabase();
+
+    renderAttendanceList();
+    renderRekapPresensi();
+
+    showToast("Presensi berhasil dihapus");
 
 }
   } catch (err) {
@@ -1379,8 +1406,9 @@ async function resetAttendance() {
       };
 
       tbody.innerHTML = data.map(d => `
-      <tr class="border-b border-gray-100 hover:bg-gray-50">
-      <td class="px-4 py-3 text-gray-700 text-sm">
+<tr class="border-b border-gray-100 hover:bg-gray-50">
+
+    <td class="px-4 py-3 text-gray-700 text-sm">
         ${formatDate(d.attendance_date)}
     </td>
 
@@ -1396,6 +1424,12 @@ async function resetAttendance() {
         <span class="${statusColors[d.attendance_status]} px-2 py-1 rounded-full text-xs font-bold">
             ${d.attendance_status}
         </span>
+    </td>
+
+    <td class="px-4 py-3 text-center">
+
+        <button onclick="editAttendance('${d.id}')"class="text-blue-600 hover:text-blue-800 text-lg mr-2"title="Edit"> ✏️</button>
+        <button onclick="confirmDeleteAttendance('${d.id}')"class="text-red-600 hover:text-red-800 text-lg"title="Hapus">🗑️</button>
     </td>
 </tr>
 `).join('');
@@ -1527,7 +1561,6 @@ function editJournal(id){
     openModal("modal-add-journal");
 
 }
-
 //-----FUNGSI KONFIRMASI HAPUS JURNAL-----//
 function confirmDeleteJournal(id){
 
@@ -1539,6 +1572,98 @@ function confirmDeleteJournal(id){
     openModal("modal-confirm");
 
 }
+//-----FUNGSI EDIT PRESENSI-----//
+    function editAttendance(id){
+
+    const data = allData.attendance.find(a => a.id === id);
+
+    if(!data){
+        showToast("Data tidak ditemukan");
+        return;
+    }
+
+    editAttendanceId = id;
+    const classSelect = document.getElementById("edit-attendance-class");
+      // Ambil semua kelas unik dari data siswa
+      const classes = [...new Set(allData.students.map(s => s.student_class))];
+classSelect.innerHTML = classes.map(c => `
+    <option value="${c}">${c}</option>
+`).join("");
+
+      
+    document.getElementById("edit-attendance-date").value =
+        data.attendance_date;
+
+    document.getElementById("edit-attendance-name").value =
+        data.student_name;
+
+    document.getElementById("edit-attendance-class").value =
+        data.attendance_class;
+
+    document.getElementById("edit-attendance-status").value =
+        data.attendance_status;
+
+    openModal("modal-edit-attendance");
+
+}
+
+//-----FUNGSI UPDATE PRESENSI-----//
+  async function updateAttendance(e){
+
+    e.preventDefault();
+
+    const data = {
+
+        attendance_date:
+            document.getElementById("edit-attendance-date").value,
+
+        attendance_class:
+            document.getElementById("edit-attendance-class").value,
+
+        attendance_status:
+            document.getElementById("edit-attendance-status").value
+
+    };
+
+    try{
+
+        const { error } = await supabaseClient
+            .from("attendance")
+            .update(data)
+            .eq("id", editAttendanceId);
+
+        if(error) throw error;
+
+        await loadAttendanceFromSupabase();
+
+        renderAttendanceList();
+        renderRekapPresensi();
+
+        closeModal("modal-edit-attendance");
+
+        showToast("Presensi berhasil diperbarui");
+
+    }catch(err){
+
+        console.error(err);
+
+        showToast("Gagal memperbarui presensi.");
+
+    }
+
+}
+//-----FUNGSI KONFIRMASI HAPUS PRESENSI-----//
+    function confirmDeleteAttendance(id){
+
+    deleteTarget = {
+        type:"attendance",
+        id:id
+    };
+
+    openModal("modal-confirm");
+
+}
+
     // --- PDF GENERATION ---
 function addSignatures(doc, y) {
 
@@ -2122,6 +2247,7 @@ doc.save(
       document.getElementById('input-attendance-date').addEventListener('change', renderAttendanceList);
       document.getElementById('btn-save-attendance').addEventListener('click', saveAttendance);
       document.getElementById('btn-delete-all-attendance').addEventListener('click', resetAttendance);
+      document.getElementById("form-edit-attendance").addEventListener("submit", updateAttendance);
 
       // Rekap Presensi
       document.getElementById('filter-rekap-class').addEventListener('change', renderRekapPresensi);
@@ -2129,6 +2255,7 @@ doc.save(
       document.getElementById('filter-rekap-month').addEventListener('change', renderRekapPresensi);
       document.getElementById('btn-download-presensi-pdf').addEventListener('click', downloadPresensiPDF);
       document.getElementById('btn-download-presensi-monthly-pdf').addEventListener('click', downloadPresensiMonthlyPDF);
+      
       
       // Journal
       document.getElementById('btn-add-journal').addEventListener('click', () => openModal('modal-add-journal'));
