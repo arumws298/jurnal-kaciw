@@ -327,6 +327,7 @@ body.dark .text-gray-500{
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <button id="btn-add-student-manual" class="btn-primary text-white font-semibold py-3 px-4 rounded-xl shadow-md"> + Tambah Manual </button> 
             <button id="btn-download-template" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md"> ↓ Template Excel </button> 
+            <button id="btn-export-students" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md"> 📥 Export Semua Siswa </button>
             <label class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-4 rounded-xl transition-all text-center cursor-pointer shadow-md"> 📁 Import Excel <input type="file" id="input-import-excel" accept=".xlsx,.xls" class="hidden"> </label> 
             <button id="btn-delete-all-students" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md"> ❌ Hapus Semua </button>
             <button id="btn-delete-class-students" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md"> 🗑 Hapus Kelas Ini </button>
@@ -3398,6 +3399,76 @@ setTimeout(() => {
     pasangTombolJurnalMingguan();
 
 }, 1000);
+
+    // ==========================================
+// EXPORT SEMUA DATA SISWA KE EXCEL
+// ==========================================
+async function exportSemuaSiswaExcel() {
+  try {
+    showToast("Sedang mengambil semua data siswa...");
+
+    const semuaSiswa = [];
+    const ukuranBatch = 500;
+    let mulai = 0;
+
+    while (true) {
+      const { data, error } = await supabaseClient
+        .from('students')
+        .select('*')
+        .order('student_class', { ascending: true })
+        .order('student_name', { ascending: true })
+        .order('id', { ascending: true })
+        .range(mulai, mulai + ukuranBatch - 1);
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        break;
+      }
+
+      semuaSiswa.push(...data);
+
+      // Kalau data yang didapat kurang dari ukuran batch,
+      // berarti sudah mencapai data terakhir.
+      if (data.length < ukuranBatch) {
+        break;
+      }
+
+      mulai += ukuranBatch;
+    }
+
+    if (semuaSiswa.length === 0) {
+      showToast("Tidak ada data siswa untuk diexport.");
+      return;
+    }
+
+    // Buat worksheet dari SEMUA data
+    const ws = XLSX.utils.json_to_sheet(semuaSiswa);
+
+    // Buat workbook
+    const wb = XLSX.utils.book_new();
+
+    // Masukkan worksheet
+    XLSX.utils.book_append_sheet(wb, ws, "Data Siswa");
+
+    // Download Excel
+    XLSX.writeFile(wb, "Students_Lengkap.xlsx");
+
+    showToast(`Berhasil! ${semuaSiswa.length} siswa diexport ke Excel.`);
+    
+  } catch (err) {
+    console.error("Export Students Error:", err);
+    showToast("Gagal export data siswa: " + (err.message || err));
+  }
+}
+
+// Pasang tombol export
+document.getElementById('btn-export-students')?.addEventListener(
+  'click',
+  exportSemuaSiswaExcel
+);
   </script>
 </body>
 </html>
