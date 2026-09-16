@@ -2023,18 +2023,27 @@ function addSignatures(doc, y) {
     doc.setFont(undefined, 'normal');
 
 const kelas = document.getElementById("filter-rekap-class").value;
-doc.text("Kelas",14,69);
-doc.text(":",50,69);
-doc.text(kelas || "Semua Kelas",54,69);
 
-doc.text("Nama",14,75);
-doc.text(":",50,75);
-doc.text(CONFIG.teacher_name,54,75);
+// ======================
+// IDENTITAS
+// ======================
 
-doc.text("Mata Pelajaran",14,81);
-doc.text(":",50,81);
-doc.text(CONFIG.subject_name,54,81);
+const labelX = 14;
+const colonX = 50;
+const valueX = 54;
 
+doc.text("Kelas", labelX, 69);
+doc.text(":", colonX, 69);
+doc.text(kelas || "Semua Kelas", valueX, 69);
+
+doc.text("Nama", labelX, 75);
+doc.text(":", colonX, 75);
+doc.text(CONFIG.teacher_name, valueX, 75);
+
+doc.text("Mata Pelajaran", labelX, 81);
+doc.text(":", colonX, 81);
+doc.text(CONFIG.subject_name, valueX, 81);
+      
       // Data
       const data = allData.attendance.map(a => [
         formatDateLong(a.attendance_date), a.student_name, a.attendance_class, a.attendance_status
@@ -2075,17 +2084,14 @@ const rowGap = 8;
 doc.setFont("helvetica","normal");
 doc.setFontSize(11);
 
-// Kelas
 doc.text("Kelas", labelX, startY);
 doc.text(":", colonX, startY);
 doc.text("Semua Kelas", valueX, startY);
 
-// Nama
 doc.text("Nama", labelX, startY + rowGap);
 doc.text(":", colonX, startY + rowGap);
 doc.text(CONFIG.teacher_name, valueX, startY + rowGap);
 
-// Mata Pelajaran
 doc.text("Mata Pelajaran", labelX, startY + rowGap * 2);
 doc.text(":", colonX, startY + rowGap * 2);
 doc.text(CONFIG.subject_name, valueX, startY + rowGap * 2);
@@ -2179,10 +2185,6 @@ doc.setFont("helvetica","normal");
 doc.setFontSize(12);
 doc.text(`Periode : ${periode}`,105,66,{align:"center"});
 
-// ======================
-// IDENTITAS
-// ======================
-
 const labelX = 14;
 const colonX = 50;
 const valueX = 54;
@@ -2192,17 +2194,15 @@ const rowGap = 8;
 
 doc.setFont("helvetica", "normal");
 doc.setFontSize(10);
-// Kelas
+
 doc.text("Kelas", labelX, startY);
 doc.text(":", colonX, startY);
 doc.text(kelas || "Semua Kelas", valueX, startY);
 
-// Nama
 doc.text("Nama", labelX, startY + rowGap);
 doc.text(":", colonX, startY + rowGap);
 doc.text(CONFIG.teacher_name, valueX, startY + rowGap);
 
-// Mata Pelajaran
 doc.text("Mata Pelajaran", labelX, startY + rowGap * 2);
 doc.text(":", colonX, startY + rowGap * 2);
 doc.text(CONFIG.subject_name, valueX, startY + rowGap * 2);
@@ -2401,12 +2401,9 @@ doc.text("REKAP KEHADIRAN PEMBELAJARAN",105,56,{ align: "center" }
 // IDENTITAS
 // ======================
 
-doc.setFont("helvetica","normal");
-doc.setFontSize(11);
-
 const labelX = 14;
-const colonX = 34;
-const valueX = 38;
+const colonX = 50;
+const valueX = 54;
 
 doc.setFont("helvetica","normal");
 doc.setFontSize(11);
@@ -2418,7 +2415,7 @@ doc.text(kelas, valueX, 66);
 doc.text("Periode", labelX, 73);
 doc.text(":", colonX, 73);
 doc.text(periodeText, valueX, 73);
-
+  
 // ======================
 // TABEL
 // ======================
@@ -3058,29 +3055,33 @@ function buatPDFPresensiMingguan(
 
     doc.setFontSize(10);
 
-    doc.text(
-        `Periode : ${formatDateLong(mulai)} s.d. ${formatDateLong(sampai)}`,
-        14,
-        68
-    );
+  // ======================
+// IDENTITAS
+// ======================
 
-    doc.text(
-        `Kelas : ${kelas || 'Semua Kelas'}`,
-        14,
-        76
-    );
+const labelX = 14;
+const colonX = 50;
+const valueX = 54;
 
-    doc.text(
-        `Nama : ${CONFIG.teacher_name}`,
-        14,
-        84
-    );
+doc.text("Periode", labelX, 68);
+doc.text(":", colonX, 68);
+doc.text(
+    `${formatDateLong(mulai)} s.d. ${formatDateLong(sampai)}`,
+    valueX,
+    68
+);
 
-    doc.text(
-        `Mata Pelajaran : ${CONFIG.subject_name}`,
-        14,
-        92
-    );
+doc.text("Kelas", labelX, 76);
+doc.text(":", colonX, 76);
+doc.text(kelas || "Semua Kelas", valueX, 76);
+
+doc.text("Nama", labelX, 84);
+doc.text(":", colonX, 84);
+doc.text(CONFIG.teacher_name, valueX, 84);
+
+doc.text("Mata Pelajaran", labelX, 92);
+doc.text(":", colonX, 92);
+doc.text(CONFIG.subject_name, valueX, 92);
 
     const rows =
         data.map(a => [
@@ -3259,30 +3260,34 @@ function buatPDFJurnalMingguan(
 
     doc.setFontSize(10);
 
-    doc.text(
-        `Periode : ${formatDateLong(mulai)} s.d. ${formatDateLong(sampai)}`,
-        14,
-        68
-    );
+  // ======================
+// IDENTITAS
+// ======================
 
-    doc.text(
-        `Kelas : ${kelas || 'Semua Kelas'}`,
-        14,
-        76
-    );
+const labelX = 14;
+const colonX = 50;
+const valueX = 54;
 
-    doc.text(
-        `Nama : ${CONFIG.teacher_name}`,
-        14,
-        84
-    );
+doc.text("Periode", labelX, 68);
+doc.text(":", colonX, 68);
+doc.text(
+    `${formatDateLong(mulai)} s.d. ${formatDateLong(sampai)}`,
+    valueX,
+    68
+);
 
-    doc.text(
-        `Mata Pelajaran : ${CONFIG.subject_name}`,
-        14,
-        92
-    );
+doc.text("Kelas", labelX, 76);
+doc.text(":", colonX, 76);
+doc.text(kelas || "Semua Kelas", valueX, 76);
 
+doc.text("Nama", labelX, 84);
+doc.text(":", colonX, 84);
+doc.text(CONFIG.teacher_name, valueX, 84);
+
+doc.text("Mata Pelajaran", labelX, 92);
+doc.text(":", colonX, 92);
+doc.text(CONFIG.subject_name, valueX, 92);
+    
     const rows =
         jurnal.map(j => [
 
