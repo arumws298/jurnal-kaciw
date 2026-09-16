@@ -2584,6 +2584,868 @@ async function testConnection() {
 window.addEventListener('DOMContentLoaded', async () => {
   await initApp();
 });
+
+    /* =========================================================
+   TAMBAHAN PDF MINGGUAN
+   ========================================================= */
+
+(function () {
+
+    /* =========================
+       TOMBOL PDF MINGGUAN
+       ========================= */
+
+    const presensiArea = document.querySelector(
+        '#rekap-presensi-page .flex.items-center.justify-between .flex.gap-2'
+    );
+
+    if (presensiArea) {
+
+        const tombol = document.createElement('button');
+
+        tombol.id = 'btn-download-presensi-weekly-pdf';
+
+        tombol.className =
+            'bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-xl transition-all shadow-sm';
+
+        tombol.innerHTML = '📄 PDF Mingguan';
+
+        const tombolBulanan =
+            document.getElementById(
+                'btn-download-presensi-monthly-pdf'
+            );
+
+        if (tombolBulanan) {
+            tombolBulanan.after(tombol);
+        }
+    }
+
+
+    const jurnalArea = document.querySelector(
+        '#rekap-jurnal-page .flex.items-center.justify-between .flex.gap-2'
+    );
+
+    if (jurnalArea) {
+
+        const tombol = document.createElement('button');
+
+        tombol.id = 'btn-download-jurnal-weekly-pdf';
+
+        tombol.className =
+            'bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-xl transition-all shadow-sm';
+
+        tombol.innerHTML = '📄 PDF Mingguan';
+
+        const tombolBulanan =
+            document.getElementById(
+                'btn-download-jurnal-monthly-pdf'
+            );
+
+        if (tombolBulanan) {
+            tombolBulanan.after(tombol);
+        }
+    }
+
+
+    /* =========================
+       INPUT TANGGAL PRESENSI
+       ========================= */
+
+    const presensiFilter = document.querySelector(
+        '#rekap-presensi-page .grid.grid-cols-1.md\\:grid-cols-3'
+    );
+
+    if (presensiFilter) {
+
+        const div = document.createElement('div');
+
+        div.className =
+            'grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-green-50 p-4 rounded-xl';
+
+        div.innerHTML = `
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Dari Tanggal
+                </label>
+
+                <input
+                    type="date"
+                    id="filter-rekap-week-start"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Sampai Tanggal
+                </label>
+
+                <input
+                    type="date"
+                    id="filter-rekap-week-end"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white">
+            </div>
+        `;
+
+        presensiFilter.after(div);
+    }
+
+
+    /* =========================
+       INPUT TANGGAL JURNAL
+       ========================= */
+
+    const jurnalFilter = document.querySelector(
+        '#rekap-jurnal-page .mb-6.flex.flex-col'
+    );
+
+    if (jurnalFilter) {
+
+        const div = document.createElement('div');
+
+        div.className =
+            'grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-green-50 p-4 rounded-xl';
+
+        div.innerHTML = `
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Dari Tanggal
+                </label>
+
+                <input
+                    type="date"
+                    id="filter-jurnal-week-start"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Sampai Tanggal
+                </label>
+
+                <input
+                    type="date"
+                    id="filter-jurnal-week-end"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white">
+            </div>
+        `;
+
+        jurnalFilter.after(div);
+    }
+
+
+    /* =========================
+       PDF MINGGUAN PRESENSI
+       ========================= */
+
+    window.downloadPresensiWeeklyPDF = async function () {
+
+        const startDate =
+            document.getElementById(
+                'filter-rekap-week-start'
+            ).value;
+
+        const endDate =
+            document.getElementById(
+                'filter-rekap-week-end'
+            ).value;
+
+        const kelas =
+            document.getElementById(
+                'filter-rekap-class'
+            ).value;
+
+
+        if (!startDate || !endDate) {
+            showToast(
+                'Pilih tanggal mulai dan tanggal akhir terlebih dahulu.'
+            );
+            return;
+        }
+
+
+        if (startDate > endDate) {
+            showToast(
+                'Tanggal akhir tidak boleh sebelum tanggal mulai.'
+            );
+            return;
+        }
+
+
+        const jumlahHari =
+            Math.floor(
+                (
+                    new Date(endDate) -
+                    new Date(startDate)
+                ) /
+                (1000 * 60 * 60 * 24)
+            ) + 1;
+
+
+        if (jumlahHari > 7) {
+            showToast(
+                'Periode PDF mingguan maksimal 7 hari.'
+            );
+            return;
+        }
+
+
+        if (!kelas) {
+            showToast(
+                'Pilih kelas terlebih dahulu.'
+            );
+            return;
+        }
+
+
+        const presensi =
+            allData.attendance.filter(a =>
+                a.attendance_class === kelas &&
+                a.attendance_date >= startDate &&
+                a.attendance_date <= endDate
+            );
+
+
+        if (presensi.length === 0) {
+            showToast(
+                'Tidak ada data presensi pada periode tersebut.'
+            );
+            return;
+        }
+
+
+        const dates = [
+            ...new Set(
+                presensi.map(
+                    a => a.attendance_date
+                )
+            )
+        ].sort();
+
+
+        const students =
+            allData.students
+                .filter(
+                    s => s.student_class === kelas
+                )
+                .sort(
+                    (a, b) =>
+                        a.student_name.localeCompare(
+                            b.student_name,
+                            'id'
+                        )
+                );
+
+
+        const head = [
+            'Nama Siswa',
+            ...dates.map(formatDateShort)
+        ];
+
+
+        const body = [];
+
+
+        students.forEach(student => {
+
+            const row = [
+                student.student_name
+            ];
+
+
+            dates.forEach(date => {
+
+                row.push(
+                    getAttendanceStatus(
+                        student.student_name,
+                        date,
+                        kelas,
+                        presensi
+                    )
+                );
+
+            });
+
+
+            body.push(row);
+
+        });
+
+
+        const { jsPDF } = window.jspdf;
+
+
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+
+        if (KOP_IMAGE) {
+
+            doc.addImage(
+                KOP_IMAGE,
+                'PNG',
+                10,
+                5,
+                277,
+                42
+            );
+
+        }
+
+
+        doc.setFont(
+            'helvetica',
+            'bold'
+        );
+
+        doc.setFontSize(16);
+
+
+        doc.text(
+            'REKAP KEHADIRAN PEMBELAJARAN',
+            148,
+            56,
+            {
+                align: 'center'
+            }
+        );
+
+
+        doc.setFont(
+            'helvetica',
+            'normal'
+        );
+
+        doc.setFontSize(11);
+
+
+        doc.text(
+            'Kelas',
+            14,
+            66
+        );
+
+        doc.text(
+            ':',
+            34,
+            66
+        );
+
+        doc.text(
+            kelas,
+            38,
+            66
+        );
+
+
+        doc.text(
+            'Periode',
+            14,
+            73
+        );
+
+        doc.text(
+            ':',
+            34,
+            73
+        );
+
+        doc.text(
+            `${formatDateLong(startDate)} s.d. ${formatDateLong(endDate)}`,
+            38,
+            73
+        );
+
+
+        doc.autoTable({
+
+            startY: 82,
+
+            head: [head],
+
+            body: body,
+
+            theme: 'grid',
+
+            styles: {
+                fontSize: 8,
+                halign: 'center',
+                valign: 'middle',
+                lineWidth: 0.2,
+                lineColor: [180,180,180],
+                textColor: [0,0,0]
+            },
+
+            headStyles: {
+                fillColor: [30,64,175],
+                textColor: [255,255,255],
+                fontStyle: 'bold'
+            },
+
+            columnStyles: {
+                0: {
+                    cellWidth: 60,
+                    halign: 'left'
+                }
+            },
+
+            didParseCell: function(data) {
+
+                if (
+                    data.section !== 'body' ||
+                    data.column.index === 0
+                ) {
+                    return;
+                }
+
+
+                const status =
+                    data.cell.raw;
+
+
+                data.cell.text = [''];
+
+
+                if (status === 'Hadir') {
+
+                    data.cell.styles.fillColor =
+                        [34,197,94];
+
+                }
+
+                else if (status === 'Izin') {
+
+                    data.cell.styles.fillColor =
+                        [59,130,246];
+
+                }
+
+                else if (status === 'Sakit') {
+
+                    data.cell.styles.fillColor =
+                        [250,204,21];
+
+                }
+
+                else if (status === 'Dispensasi') {
+
+                    data.cell.styles.fillColor =
+                        [168,85,247];
+
+                }
+
+                else if (status === 'Alpa') {
+
+                    data.cell.styles.fillColor =
+                        [239,68,68];
+
+                }
+
+            }
+
+        });
+
+
+        const finalY =
+            doc.lastAutoTable.finalY;
+
+
+        drawAttendanceLegend(
+            doc,
+            finalY + 10
+        );
+
+
+        addSignatures(
+            doc,
+            finalY + 40
+        );
+
+
+        doc.save(
+            `Presensi_Mingguan_${kelas.replace(/\s+/g,'_')}_${startDate}_${endDate}.pdf`
+        );
+
+    };
+
+
+    /* =========================
+       PDF MINGGUAN JURNAL
+       ========================= */
+
+    window.downloadJurnalWeeklyPDF = async function () {
+
+        const startDate =
+            document.getElementById(
+                'filter-jurnal-week-start'
+            ).value;
+
+        const endDate =
+            document.getElementById(
+                'filter-jurnal-week-end'
+            ).value;
+
+        const kelas =
+            document.getElementById(
+                'filter-jurnal-class'
+            ).value;
+
+
+        if (!startDate || !endDate) {
+
+            showToast(
+                'Pilih tanggal mulai dan tanggal akhir terlebih dahulu.'
+            );
+
+            return;
+        }
+
+
+        if (startDate > endDate) {
+
+            showToast(
+                'Tanggal akhir tidak boleh sebelum tanggal mulai.'
+            );
+
+            return;
+        }
+
+
+        const jumlahHari =
+            Math.floor(
+                (
+                    new Date(endDate) -
+                    new Date(startDate)
+                ) /
+                (1000 * 60 * 60 * 24)
+            ) + 1;
+
+
+        if (jumlahHari > 7) {
+
+            showToast(
+                'Periode PDF mingguan maksimal 7 hari.'
+            );
+
+            return;
+        }
+
+
+        const jurnal =
+            allData.journals
+                .filter(j => {
+
+                    const tanggalCocok =
+                        j.journal_date >= startDate &&
+                        j.journal_date <= endDate;
+
+                    const kelasCocok =
+                        kelas
+                            ? j.journal_class === kelas
+                            : true;
+
+                    return (
+                        tanggalCocok &&
+                        kelasCocok
+                    );
+
+                })
+                .sort((a,b) => {
+
+                    const tanggal =
+                        new Date(a.journal_date) -
+                        new Date(b.journal_date);
+
+                    if (tanggal !== 0) {
+                        return tanggal;
+                    }
+
+                    return String(
+                        a.journal_time
+                    ).localeCompare(
+                        String(b.journal_time)
+                    );
+
+                });
+
+
+        if (jurnal.length === 0) {
+
+            showToast(
+                'Tidak ada jurnal pada periode tersebut.'
+            );
+
+            return;
+        }
+
+
+        const { jsPDF } =
+            window.jspdf;
+
+
+        const doc =
+            new jsPDF();
+
+
+        if (KOP_IMAGE) {
+
+            doc.addImage(
+                KOP_IMAGE,
+                'PNG',
+                10,
+                5,
+                190,
+                42
+            );
+
+        }
+
+
+        doc.setFont(
+            'helvetica',
+            'bold'
+        );
+
+        doc.setFontSize(16);
+
+
+        doc.text(
+            'JURNAL MENGAJAR GURU',
+            105,
+            58,
+            {
+                align: 'center'
+            }
+        );
+
+
+        doc.setFont(
+            'helvetica',
+            'normal'
+        );
+
+        doc.setFontSize(12);
+
+
+        doc.text(
+            `Periode : ${formatDateLong(startDate)} s.d. ${formatDateLong(endDate)}`,
+            105,
+            66,
+            {
+                align: 'center'
+            }
+        );
+
+
+        const labelX = 14;
+        const colonX = 50;
+        const valueX = 54;
+        const startY = 76;
+        const rowGap = 8;
+
+
+        doc.setFontSize(10);
+
+
+        doc.text(
+            'Kelas',
+            labelX,
+            startY
+        );
+
+        doc.text(
+            ':',
+            colonX,
+            startY
+        );
+
+        doc.text(
+            kelas || 'Semua Kelas',
+            valueX,
+            startY
+        );
+
+
+        doc.text(
+            'Nama',
+            labelX,
+            startY + rowGap
+        );
+
+        doc.text(
+            ':',
+            colonX,
+            startY + rowGap
+        );
+
+        doc.text(
+            CONFIG.teacher_name,
+            valueX,
+            startY + rowGap
+        );
+
+
+        doc.text(
+            'Mata Pelajaran',
+            labelX,
+            startY + rowGap * 2
+        );
+
+        doc.text(
+            ':',
+            colonX,
+            startY + rowGap * 2
+        );
+
+        doc.text(
+            CONFIG.subject_name,
+            valueX,
+            startY + rowGap * 2
+        );
+
+
+        const data =
+            jurnal.map(j => [
+
+                formatDateLong(
+                    j.journal_date
+                ),
+
+                j.journal_time,
+
+                j.journal_class,
+
+                j.journal_topic,
+
+                j.journal_activity
+
+            ]);
+
+
+        doc.autoTable({
+
+            startY: 106,
+
+            head: [[
+                'Tanggal',
+                'Jam',
+                'Kelas',
+                'Topik',
+                'Aktivitas'
+            ]],
+
+            body: data,
+
+            theme: 'grid',
+
+            styles: {
+                fontSize: 10,
+                valign: 'middle'
+            },
+
+            headStyles: {
+                fillColor: [30,64,175],
+                textColor: [255,255,255],
+                halign: 'center',
+                fontStyle: 'bold'
+            },
+
+            columnStyles: {
+
+                0: {
+                    cellWidth: 34
+                },
+
+                1: {
+                    cellWidth: 12,
+                    halign: 'center'
+                },
+
+                2: {
+                    cellWidth: 22,
+                    halign: 'center'
+                },
+
+                3: {
+                    cellWidth: 48,
+                    halign: 'center'
+                },
+
+                4: {
+                    cellWidth: 'auto'
+                }
+
+            }
+
+        });
+
+
+        const finalY =
+            doc.lastAutoTable.finalY + 20;
+
+
+        if (finalY < 250) {
+
+            addSignatures(
+                doc,
+                finalY
+            );
+
+        } else {
+
+            doc.addPage();
+
+            addSignatures(
+                doc,
+                20
+            );
+
+        }
+
+
+        doc.save(
+            `Jurnal_Mingguan_${(kelas || 'Semua_Kelas').replace(/\s+/g,'_')}_${startDate}_${endDate}.pdf`
+        );
+
+    };
+
+
+    /* =========================
+       AKTIFKAN TOMBOL
+       ========================= */
+
+    const tombolPresensi =
+        document.getElementById(
+            'btn-download-presensi-weekly-pdf'
+        );
+
+    if (tombolPresensi) {
+
+        tombolPresensi.addEventListener(
+            'click',
+            downloadPresensiWeeklyPDF
+        );
+
+    }
+
+
+    const tombolJurnal =
+        document.getElementById(
+            'btn-download-jurnal-weekly-pdf'
+        );
+
+    if (tombolJurnal) {
+
+        tombolJurnal.addEventListener(
+            'click',
+            downloadJurnalWeeklyPDF
+        );
+
+    }
+
+})();
   </script>
 </body>
 </html>
